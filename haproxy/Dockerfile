@@ -1,0 +1,25 @@
+FROM openqsafe/liboqs-ubuntu-bionic-dev
+
+RUN apt-get update -qq  && apt-get -y upgrade && apt-get install -y unzip lighttpd
+
+# build haproxy
+WORKDIR /root
+RUN wget https://github.com/haproxy/haproxy/archive/master.zip && unzip master.zip 
+
+RUN cd /root/haproxy-master && make SSL_INC=/opt/oqssa/include SSL_LIB=/opt/oqssa/lib TARGET=linux-glibc USE_OPENSSL=1 && make install
+
+WORKDIR /opt/haproxy
+COPY startup.sh /opt/haproxy/startup.sh
+COPY haproxy.cfg /opt/haproxy/haproxy.cfg
+
+#
+## forward request and error logs to docker log collector
+#RUN ln -sf /dev/stdout /opt/httpd/logs/access_log && \
+#    ln -sf /dev/stderr /opt/httpd/logs/error_log;
+#
+#EXPOSE 4433
+#
+#STOPSIGNAL SIGTERM
+
+#CMD ["/opt/httpd/bin/httpd", "-DFOREGROUND"]
+ENTRYPOINT ["/opt/haproxy/startup.sh"]
