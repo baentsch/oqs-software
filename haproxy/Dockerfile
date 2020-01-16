@@ -6,7 +6,7 @@ RUN apt-get update -qq  && apt-get -y upgrade && apt-get install -y unzip lightt
 WORKDIR /root
 RUN wget https://github.com/haproxy/haproxy/archive/master.zip && unzip master.zip 
 
-RUN cd /root/haproxy-master && make SSL_INC=/opt/oqssa/include SSL_LIB=/opt/oqssa/lib TARGET=linux-glibc USE_OPENSSL=1 && make install
+RUN cd /root/haproxy-master && make LDFLAGS="-Wl,-rpath,/opt/oqssa/lib" SSL_INC=/opt/oqssa/include SSL_LIB=/opt/oqssa/lib TARGET=linux-glibc USE_OPENSSL=1 && make install
 
 # build curl
 WORKDIR /root
