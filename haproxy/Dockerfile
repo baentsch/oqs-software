@@ -16,7 +16,7 @@ RUN wget https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz && tar -zxvf 
 
 WORKDIR /root/curl-${CURL_VERSION}
 RUN env CPPFLAGS="-I/opt/ossl-src/oqs/include" \
-        ./configure --prefix=/opt/curl \
+        LDFLAGS=-Wl,-R/opt/oqssa/lib ./configure --prefix=/opt/curl \
                     --enable-debug \
                     --with-ssl=/opt/oqssa && \
     sed -i 's/EVP_MD_CTX_create/EVP_MD_CTX_new/g; s/EVP_MD_CTX_destroy/EVP_MD_CTX_free/g' lib/vtls/openssl.c && \
