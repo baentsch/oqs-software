@@ -1,5 +1,5 @@
 #!/bin/bash
 
-#docker run -p 80:80 -p 443:443 --add-host my.back.end:127.0.0.1 -it oqssa-haproxy
-docker run -p 80:80 -p 443:443 --add-host my.back.end:127.0.0.1 -it oqssa-haproxy-plain
+docker run -v /dev/log:/dev/log -p 8080:80 -p 4443:443 --add-host my.ha.proxy:127.0.0.1 -it haproxy
+#docker run -v /dev/log:/dev/log -p 8080:80 -p 4443:443 --add-host my.ha.proxy:127.0.0.1 -it haproxy-plain
 

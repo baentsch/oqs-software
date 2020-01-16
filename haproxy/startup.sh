@@ -11,7 +11,7 @@ export OQSSA=/opt/oqssa
 export OPENSSL=${OQSSA}/bin/openssl
 export OPENSSL_CNF=${OQSSA}/openssl.cnf
 
-export SIG_ALG=rsa
+export SIG_ALG=dilithium4
 
 cd /opt/haproxy
 # generate CA key and cert

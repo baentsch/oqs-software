@@ -8,6 +8,21 @@ RUN wget https://github.com/haproxy/haproxy/archive/master.zip && unzip master.z
 
 RUN cd /root/haproxy-master && make SSL_INC=/opt/oqssa/include SSL_LIB=/opt/oqssa/lib TARGET=linux-glibc USE_OPENSSL=1 && make install
 
+# build curl
+WORKDIR /root
+ENV CURL_VERSION 7.66.0
+
+RUN wget https://curl.haxx.se/download/curl-${CURL_VERSION}.tar.gz && tar -zxvf curl-${CURL_VERSION}.tar.gz;
+
+WORKDIR /root/curl-${CURL_VERSION}
+RUN env CPPFLAGS="-I/opt/ossl-src/oqs/include" \
+        ./configure --prefix=/opt/curl \
+                    --enable-debug \
+                    --with-ssl=/opt/oqssa && \
+    sed -i 's/EVP_MD_CTX_create/EVP_MD_CTX_new/g; s/EVP_MD_CTX_destroy/EVP_MD_CTX_free/g' lib/vtls/openssl.c && \
+    make && make install;
+
+
 WORKDIR /opt/haproxy
 COPY startup.sh /opt/haproxy/startup.sh
 COPY haproxy.cfg /opt/haproxy/haproxy.cfg
