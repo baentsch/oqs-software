@@ -1,0 +1,14 @@
+# Ignore editor artefacts
+/.dir-locals.el
+
+# Misc auto generated files
+/haproxy/alpine/opt*
+
+# editor artefacts
+*.swp
+.#*
+\#*#
+*~
+
+# archived stuff
+*-archived
