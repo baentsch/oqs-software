@@ -11,6 +11,8 @@ RUN cd /root/haproxy-master && make TARGET=linux-glibc USE_OPENSSL=1 && make ins
 WORKDIR /opt/haproxy
 COPY startup.sh /opt/haproxy/startup.sh
 COPY haproxy.cfg /opt/haproxy/haproxy.cfg
+COPY upload.cgi /usr/lib/cgi-bin/upload.cgi
+COPY 10-cgi.conf /etc/lighttpd/conf-enabled/10-cgi.conf
 RUN echo "Hello World from lighthttpd backend. If you see this, all is fine: lighttpd data served via haproxy..." > /var/www/html/index.html
 
 ENTRYPOINT ["/opt/haproxy/startup.sh"]
