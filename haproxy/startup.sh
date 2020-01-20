@@ -2,6 +2,8 @@
 
 # Change backend port to 82 to match haproxy.cfg:
 sed -e "s/\= 80/\= 82/g" -i /etc/lighttpd/lighttpd.conf 
+# enable cgi
+lighttpd-enable-mod cgi
 
 # Start backend server:
 service lighttpd start
@@ -31,6 +33,6 @@ fi
 cat conf/server.crt conf/server.key > certkey.pem
 
 # Start HAProxy:
-haproxy -D -f /opt/haproxy/haproxy.cfg
+/opt/oqssa/sbin/haproxy -D -f /opt/haproxy/haproxy.cfg
 
 /bin/bash
