@@ -2,6 +2,7 @@
 
 # Change backend port to 82:
 sed -e "s/\= 80/\= 82/g" -i /etc/lighttpd/lighttpd.conf 
+lighttpd-enable-mod cgi
 
 # Start backend server:
 service lighttpd start
