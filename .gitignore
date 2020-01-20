@@ -3,6 +3,8 @@
 
 # Misc auto generated files
 /haproxy/alpine/opt*
+/haproxy/oqs-*
+/haproxy/alpine/CA.crt
 
 # editor artefacts
 *.swp

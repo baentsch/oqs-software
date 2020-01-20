@@ -8,10 +8,11 @@ RUN apk update && apk upgrade
 
 ADD opt /opt
 ADD haproxy-appliance.cfg /opt/haproxy/haproxy.cfg
+ADD startup-appliance.sh /opt/haproxy/startup.sh
 ADD CA.crt /opt/haproxy/CA.crt
 
 WORKDIR /opt/haproxy
 ENV OQSINTERNALS 1
 ENV OQSWARNINGDISABLE 1
 
-CMD ["/opt/oqssa/sbin/haproxy", "-f", "/opt/haproxy/haproxy.cfg"]
+ENTRYPOINT ["/opt/haproxy/startup.sh"]
