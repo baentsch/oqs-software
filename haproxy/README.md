@@ -48,13 +48,22 @@ If one wants to interact with all components on a command line within the runnin
 
 All default settings for running the haproxy are encoded in the `haproxy.cfg` configuration file (in `/opt/haproxy`).
 
-## More realistic setup
+### Docker hub availability
+
+The docker image containing all components as described here is available at Dockerhub under the name `openqsafe/haproxy-ubuntu`.
+
+### Building
+
+The docker image providing the core functionality described can be build by running the script `scripts/dockerbuild.sh`. The script has been validated to run OK under Linux and OSX with docker [installed](https://docs.docker.com/install/).
+
+## More realistic setup: Separating CA and HAproxy
 
 For anyone interested in running an HAproxy for a longer period and utilizing a more realistic setup with an QSC-enabled certificate authority (CA) the following utility scripts permit doing this:
 
-- `scripts/create-oqsca.sh`: Creates self-signed, password-protected QSC key/cert pair. The QSC algorithm chosen can be changed from the default setting (`dilithium4`) with the parameter `-s`.
-- `scripts/gen-server-csr.sh`: Creates QSC key and certificate signing request (CSR) for the server DNS name passed as parameter. The QSC algorithm chosen can be changed from the default setting (`dilithium4`) with the parameter `-s`.
-- `scripts/sign-server-csr.sh`: Signs the CSR created in the second step with the CA key created in the first step.
+1. `scripts/create-oqsca.sh`: Creates self-signed, password-protected QSC key/cert pair acting as a root CA for later steps. The QSC algorithm chosen can be changed from the default setting (`dilithium4`) with the parameter `-s`.
+2. `scripts/gen-server-csr.sh`: Creates QSC key and certificate signing request (CSR) for the server DNS name passed as parameter. The QSC algorithm chosen can be changed from the default setting (`dilithium4`) with the parameter `-s`.
+3. `scripts/sign-server-csr.sh`: Signs the CSR created in the second step with the CA key created in the first step.
+4. `scripts/haproxy-run.sh`: Start the docker image on the host named in step 2 above.
 
 ## Further configuration options
 
@@ -97,7 +106,7 @@ In words: A second HAproxy is configured as a local, application-level VPN tunne
 
 ### Building
 
-Creating the appliance is a two-step process executed by the script `dockerbuild.sh`:
+Creating the appliance is a two-step process executed by the script `dockerbuild.sh` in the `alpine` folder:
 
 - Compile-Install: All components introduced above are build and installed to a local folder (`opt`)
 - Build: Only the resultant libraries and executables are loaded into a minimal Alpine image
@@ -105,17 +114,17 @@ Creating the appliance is a two-step process executed by the script `dockerbuild
 
 ### Parameters
 
-By default, the appliance connects to an OQS-enabled TLS server running at the DNS name `my.ha.proxy`. This name can be changed to a server address of choice by passing a parameter to the startup script `appliance-run.sh`.
+By default, the appliance connects to an OQS-enabled TLS server running at the DNS name `my.ha.proxy`. This name can be changed to a server address of choice by passing a parameter to the startup script `scripts/appliance-run.sh`.
 
 By default, the appliance is accessible at the localhost port 8082. This port can be changed by adapting the relevant number in the script itself.
 
-## Putting it all together
+## Putting it all together in a single-host demo environment
 
-Pulling all the steps above together, the script `alpine/network-run.sh` configures all components to establish the components in the architecture depicted above: 
+Pulling all the steps above together, the script `alpine/network-run.sh` configures all components to establish and exercise all components in the architecture depicted above: 
 
-- QSC-CA and server keys and certificates are generated
-- Set up a docker network into which the following two images are deployed:
+- QSC-CA and -haproxy keys and certificates are generated
+- A docker network is set up into which the following two images are deployed:
 - QSC-enabled HAproxy acting as a QSC-TLS enabled load balancer to a lighttpd instance running in the same image
 - QSC-enabled minimal HAproxy appliance acting as a local plain HTTP communications endpoint and communicating via QSC-secured TLS with the above HAproxy instance 
 
-**Hint**: The `alpine/network-run.sh` script can be called with a parameter to cause a cleanup of a previous run, e.g., run it as such for this purpose: `alpine/network-run.sh --clean`. All other parameters introduced above and controlling the actual OQS algorithms can be used. Also, the local port can be set (`--port`) at which the appliance is listening for HTTP traffic to be forwarded.
+**Hint**: The `alpine/network-run.sh` script can be called with a parameter to cause a cleanup of a previous run (`alpine/network-run.sh --clean`). All other parameters introduced above and controlling the actual OQS algorithms can also be used. Also, the local port can be set (`--port`) at which the appliance is listening for HTTP traffic to be forwarded.
