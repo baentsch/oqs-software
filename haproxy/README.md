@@ -128,3 +128,7 @@ Pulling all the steps above together, the script `alpine/network-run.sh` configu
 - QSC-enabled minimal HAproxy appliance acting as a local plain HTTP communications endpoint and communicating via QSC-secured TLS with the above HAproxy instance 
 
 **Hint**: The `alpine/network-run.sh` script can be called with a parameter to cause a cleanup of a previous run (`alpine/network-run.sh --clean`). All other parameters introduced above and controlling the actual OQS algorithms can also be used. Also, the local port can be set (`--port`) at which the appliance is listening for HTTP traffic to be forwarded.
+
+###### Footnote
+
+For comparison, the folder `non-oqs` contains all prerequisites to set up an equivalent, non-OQS-enabled HAproxy --- also in a Docker image, also using Ubuntu 19 as the base OS, also using OpenSSL 1.1.1 and TLS 1.3 as the communications parameters, also featuring lighttpd as a backend with the same basic testing targets (`/` for GET and `/cgi-bin/upload.cgi` for POST). This way, one can run and exercize HAproxy images that are QSC-enabled and containing only classic cryptography side-by-side on the same infrastructure for comparative measurements.
