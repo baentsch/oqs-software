@@ -28,7 +28,7 @@ The resultant Docker image (built when executing `scripts/dockerbuild.sh`) compr
 - curl: QSC-enabled curl
 - haproxy: QSC-enabled HAproxy
 
-In addition, the image contains a simple (non-QSC) HTTP server, [lighttpd](https://www.lighttpd.net).
+In addition, the image contains a simple (non-QSC) HTTP server, [lighttpd](https://www.lighttpd.net) serving as a (test) backend to the HAproxy.
 
 ### Architecture
 
@@ -40,9 +40,11 @@ In words: The HAproxy is configured on the frontend to provide a QSC-enabled TLS
 
 ## Quick start
 
-If provided no arguments, the docker image configures all arguments and creates all required persistent HAproxy frontend PKI artifacts in an ephemeral manner: CA (key and certificate), server (key and certificate). The utility script for this is `scripts/run.sh`.
+If provided no arguments, the docker image configures all components and creates all required persistent HAproxy frontend PKI artifacts in an ephemeral manner: CA (key and certificate), server (key and certificate). The utility script for this is `scripts/run.sh`. The resultant HAproxy is accessible at the exposed port 4443.
 
-When executed, all components are running (check via `ps -ags`) and can be exercized with the command `curl --cacert root/CA.crt https://my.ha.proxy`.
+If one wants to interact with all components on a command line within the running image, the utility script `scripts/run-bash.sh` should be run: All components are started by executing `startup.sh`, may be checked to be running (`ps -ags`) and can be exercized with the command `curl --cacert root/CA.crt https://my.ha.proxy`.
+
+**Hint**: The startup scripts can take the names of the OQS KEM and OQS signature algorithm as parameters. The former defines the cryptographic cipher used, the latter the signature type of the certificates. By default these values are `kyber512` and `dilithium4`, respectively.
 
 All default settings for running the haproxy are encoded in the `haproxy.cfg` configuration file (in `/opt/haproxy`).
 
@@ -50,11 +52,20 @@ All default settings for running the haproxy are encoded in the `haproxy.cfg` co
 
 For anyone interested in running an HAproxy for a longer period and utilizing a more realistic setup with an QSC-enabled certificate authority (CA) the following utility scripts permit doing this:
 
-- `scripts/create-oqsca.sh`: Creates self-signed, password-protected QSC key/cert pair. The QSC algorithm chosen can be changed from the default setting (`dilithium4`).
-- `scripts/gen-server-csr.sh`: Creates QSC key and certificate signing request (CSR) for the server DNS name passed as parameter. The QSC algorithm chosen can be changed from the default setting (`dilithium3`).
+- `scripts/create-oqsca.sh`: Creates self-signed, password-protected QSC key/cert pair. The QSC algorithm chosen can be changed from the default setting (`dilithium4`) with the parameter `-s`.
+- `scripts/gen-server-csr.sh`: Creates QSC key and certificate signing request (CSR) for the server DNS name passed as parameter. The QSC algorithm chosen can be changed from the default setting (`dilithium4`) with the parameter `-s`.
 - `scripts/sign-server-csr.sh`: Signs the CSR created in the second step with the CA key created in the first step.
 
 ## Further configuration options
+
+### Utility scripts
+
+All shell scripts have the same optional two parameters:
+
+- `--sig` (or `-s`): Signature algorithm: Choose any listed [here](https://github.com/open-quantum-safe/openssl#authentication). Default is `dilithium4`.
+- `--kem` (or `-k`): KEM algorithm: Choose any listed [here](https://github.com/open-quantum-safe/openssl#key-exchange). Default is `kyber512`.
+
+By way of example, the command `./scripts/run-bash.sh -s qteslapiii ` will create a docker instance running a QSC haproxy environment using QTeslaIII signatures with a Kyber512 KEM.
 
 ### HAproxy
 
@@ -91,13 +102,20 @@ Creating the appliance is a two-step process executed by the script `dockerbuild
 - Compile-Install: All components introduced above are build and installed to a local folder (`opt`)
 - Build: Only the resultant libraries and executables are loaded into a minimal Alpine image
 
+
+### Parameters
+
+By default, the appliance connects to an OQS-enabled TLS server running at the DNS name `my.ha.proxy`. This name can be changed to a server address of choice by passing a parameter to the startup script `appliance-run.sh`.
+
+By default, the appliance is accessible at the localhost port 8082. This port can be changed by adapting the relevant number in the script itself.
+
 ## Putting it all together
 
 Pulling all the steps above together, the script `alpine/network-run.sh` configures all components to establish the components in the architecture depicted above: 
 
 - QSC-CA and server keys and certificates are generated
 - Set up a docker network into which the following two images are deployed:
-- QSC-enabled HAproxy acting as a QSC-TLS enabled load balancer 
-- QSC-enabled minimal HAproxy acting as a local plain HTTP communications endpoint and communicating via QSC-secured TLS with the above HAproxy instance 
+- QSC-enabled HAproxy acting as a QSC-TLS enabled load balancer to a lighttpd instance running in the same image
+- QSC-enabled minimal HAproxy appliance acting as a local plain HTTP communications endpoint and communicating via QSC-secured TLS with the above HAproxy instance 
 
-
+**Hint**: The `alpine/network-run.sh` script can be called with a parameter to cause a cleanup of a previous run, e.g., run it as such for this purpose: `alpine/network-run.sh --clean`. All other parameters introduced above and controlling the actual OQS algorithms can be used. Also, the local port can be set (`--port`) at which the appliance is listening for HTTP traffic to be forwarded.

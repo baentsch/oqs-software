@@ -5,6 +5,7 @@
 /haproxy/alpine/opt*
 /haproxy/oqs-*
 /haproxy/alpine/CA.crt
+*.crt
 
 # editor artefacts
 *.swp

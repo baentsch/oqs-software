@@ -1,5 +1,15 @@
 #!/bin/bash
 
+if [ "x$KEM_ALG" == "x" ]; then
+   # kem name not given
+   export KEM_ALG=kyber512
+fi
+
+if [ "x$SIG_ALG" == "x" ]; then
+   # sig name not given
+   export SIG_ALG=dilithium4
+fi
+
 # Change backend port to 82 to match haproxy.cfg:
 sed -e "s/\= 80/\= 82/g" -i /etc/lighttpd/lighttpd.conf 
 # enable cgi
@@ -13,7 +23,6 @@ export OQSSA=/opt/oqssa
 export OPENSSL=${OQSSA}/bin/openssl
 export OPENSSL_CNF=${OQSSA}/ssl/openssl.cnf
 
-export SIG_ALG=dilithium4
 
 cd /opt/haproxy
 # Do on-the-fly generation only if server key not yet existing:
@@ -32,7 +41,8 @@ fi
 # The location for haproxy.cfg
 cat conf/server.crt conf/server.key > certkey.pem
 
-# Start HAProxy:
-/opt/oqssa/sbin/haproxy -D -f /opt/haproxy/haproxy.cfg
+sed -i "s/kyber512/$KEM_ALG/g" /opt/haproxy/haproxy.cfg
 
-/bin/bash
+# Start HAProxy:
+/opt/oqssa/sbin/haproxy -f /opt/haproxy/haproxy.cfg
+
