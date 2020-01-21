@@ -22,8 +22,8 @@ $OPENSSL x509 -req -in server.csr -out server.crt -CA CA.crt -CAkey CA.key -CAcr
 
 cat server.crt server.key > certkey.pem
 
-# Start HAProxy:
-haproxy -D -f /opt/haproxy/haproxy.cfg
-
 cat /opt/haproxy/CA.crt
-/bin/bash
+
+# Start HAProxy:
+haproxy -f /opt/haproxy/haproxy.cfg
+
