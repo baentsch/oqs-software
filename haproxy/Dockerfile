@@ -9,7 +9,7 @@ RUN /root/build-liboqs-openssl-curl-haproxy.sh
 COPY startup.sh /opt/haproxy/startup.sh
 COPY haproxy.cfg /opt/haproxy/haproxy.cfg
 COPY upload.cgi /usr/lib/cgi-bin/upload.cgi
-RUN echo "Hello World from lighthttpd backend. If you see this, all is fine: lighttpd data served via haproxy protected by OQSSL..." > /var/www/html/index.html
+RUN echo "Hello World from lighttpd backend. If you see this, all is fine: lighttpd data served via haproxy protected by OQSSL..." > /var/www/html/index.html
 WORKDIR /opt/haproxy
 
 CMD ["/opt/haproxy/startup.sh"]

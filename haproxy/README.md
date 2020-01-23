@@ -92,9 +92,15 @@ Setting this variable (e.g., by `export OQSINTERNALS=1`) causes the system to di
 
 Setting this variable (e.g., by `export OQSWARNINGDISABLE=1`) causes the system to no longer display the non-productiveness warning.
 
-## Appliance
+## HAproxy Appliance
 
-The folder `alpine` contains Dockerfiles and related scripts to create a small, OQS-enabled HAproxy appliance.
+The build script `scripts/dockerbuild.sh` also creates an appliance-style, OQS-enabled HAproxy in reverse proxy configuration as another docker image. This docker image only contains the basics required to run HAproxy in a QSC configuration. It does not contain curl as a frontend nor lighttpd as backend. It can be started with all the same parameters introduced above via the script `scripts/appliance-run.sh`. This script takes as optional parameter the address of the backend this HAproxy shall connect to. Default backend is at `127.0.0.1:82`.
+
+**Note**: This appliance has a plain HTTP *backend* and an OQS-enabled *frontend*. By properly changing the configuration of `haproxy.cfg` the backend configuration can be changed to a TLS-protected one as well, of course.
+
+## Local Appliance
+
+The folder `alpine` contains Dockerfiles and related scripts to create a small, OQS-enabled (forward) HAproxy appliance. The purpose of this local appliance is to shield client software from (having to use) QSC-enabled software via a simple HTTP interface. As such, it has an OQS-**backend** and a plain HTTP frontend. By properly changing the configuration of `haproxy-appliance.cfg` (e.g., providing suitable certificates) the frontend may also be TLS-protected.
 
 ### Architecture
 
@@ -114,7 +120,7 @@ Creating the appliance is a two-step process executed by the script `dockerbuild
 
 ### Parameters
 
-By default, the appliance connects to an OQS-enabled TLS server running at the DNS name `my.ha.proxy`. This name can be changed to a server address of choice by passing a parameter to the startup script `scripts/appliance-run.sh`.
+By default, the appliance connects to an OQS-enabled TLS server running at the DNS name `my.ha.proxy`. This name can be changed to a server address of choice by passing a parameter to the startup script `scripts/localapp-run.sh`.
 
 By default, the appliance is accessible at the localhost port 8082. This port can be changed by adapting the relevant number in the script itself.
 
