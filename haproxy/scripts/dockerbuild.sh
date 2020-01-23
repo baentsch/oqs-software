@@ -9,7 +9,7 @@ if [ $# -gt 0 ]; then
    docker tag $BASENAME openqsafe/$BASENAME && docker push openqsafe/$BASENAME
 fi
 
-rm -rf opt
+sudo rm -rf opt
 mkdir opt
 # Export installed dirs
 docker run -v `pwd`/opt:/home/opt -t $BASENAME bash -c "cp -R /opt/* /home/opt"

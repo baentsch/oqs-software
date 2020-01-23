@@ -9,9 +9,9 @@ fi
 cd /opt/haproxy
 
 if [ $# -eq 1 ]; then
-   # server name as sole optional parameter
+   # server address as sole optional parameter
    echo "Setting target HAproxy $1"
-   sed -i "s/my.ha.proxy/$1/g" /opt/haproxy/haproxy.cfg 
+   sed -i "s/my.ha.proxy:4443/$1/g" /opt/haproxy/haproxy.cfg 
 fi
 
 # Start HAProxy:

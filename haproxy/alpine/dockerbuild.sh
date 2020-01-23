@@ -12,6 +12,7 @@ fi
 sudo rm -rf opt/*
 if [ ! -f opt.tgz ]; then
    docker run -v `pwd`/opt:/opt -it $BASENAME-dev /root/build-liboqs-openssl-curl-haproxy.sh
+   tar czvf opt.tgz opt
 else
    tar xzvf opt.tgz
 fi
@@ -20,8 +21,6 @@ fi
 docker build -t $BASENAME-run -f Dockerfile-run .
 
 # Build an even smaller appliance:
-rm opt.tgz
-tar czvf opt.tgz opt
 sudo rm -rf opt/oqssa/lib/*.a opt/oqssa/doc opt/oqssa/share opt/bin/curl opt/lib/*curl*
 
 cp ../oqs-root/CA.crt .
