@@ -40,7 +40,21 @@ In words: The HAproxy is configured on the frontend to provide a QSC-enabled TLS
 
 ## Quick start
 
-If provided no arguments, the docker image configures all components and creates all required persistent HAproxy frontend PKI artifacts in an ephemeral manner: CA (key and certificate), server (key and certificate). The utility script for this is `scripts/run.sh`. The resultant HAproxy is accessible at the exposed port 4443.
+### Short form
+
+`docker run -p 4443:443 -e BACKEND=<backend-address:port> -t openqsafe/haproxy-appliance` starts a QSC-enabled HAproxy on port 4443 of the local machine acting as reverse proxy towards the (plain http) backend.
+
+If you have an OQS-enabled SDK or applications, you can connect to this as usual, e.g., via `curl https://HAPROXY-ADDRESS:4443`.
+
+If you do not have that, you can start a forward proxy with this command 
+
+`docker run -p 8080:8080 -e DISABLE_CERT_CHECK=1 -t openqsafe/haproxy-local-appliance HAPROXY-ADDRESS:4443` provides a plain interface to the above at `http://localhost:8080'.
+
+This sets up a transparent, application level QSC-protected tunnel between the two HAproxy instances that can be accessed with any plain HTTP tooling or browser. For more secure and realistic setups, read on.
+
+### Some more details
+
+If provided no arguments, the main docker image configures all components and creates all required persistent HAproxy frontend PKI artifacts in an ephemeral manner: CA (key and certificate), server (key and certificate). The utility script for this is `scripts/run.sh`. The resultant HAproxy is accessible at the exposed port 4443.
 
 If one wants to interact with all components on a command line within the running image, the utility script `scripts/run-bash.sh` should be run: All components are started by executing `startup.sh`, may be checked to be running (`ps -ags`) and can be exercized with the command `curl --cacert root/CA.crt https://my.ha.proxy`.
 
@@ -134,6 +148,19 @@ Pulling all the steps above together, the script `alpine/network-run.sh` configu
 - QSC-enabled minimal HAproxy appliance acting as a local plain HTTP communications endpoint and communicating via QSC-secured TLS with the above HAproxy instance 
 
 **Hint**: The `alpine/network-run.sh` script can be called with a parameter to cause a cleanup of a previous run (`alpine/network-run.sh --clean`). All other parameters introduced above and controlling the actual OQS algorithms can also be used. Also, the local port can be set (`--port`) at which the appliance is listening for HTTP traffic to be forwarded.
+
+
+## FAQ
+
+### I'm getting an "SSL handshake failure" when starting the local proxy: What's wrong?
+
+Most likely you have not configured the correct (QSC-)root CA to validate the (QSC-protected) authenticity (signature) of the HAproxy you want to connect to.
+
+Solution: Either follow the steps [above to establish a real mini CA and certificates](#more-realistic-setup-separating-ca-and-haproxy) or disable checking the server certificate by the haproxy config option `verify none`, exposed to the docker image by the environment variable `DISABLE_CERT_CHECK`.
+
+### I'm annoyed by the constant 'non-productiveness' warnings. Can they be switched off?
+
+Yes, set the environment variable `OQSWARNINGDISABLE` to a non-empty value.
 
 ###### Footnote
 
