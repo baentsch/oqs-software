@@ -17,11 +17,11 @@ The scripts in this folder are geared for Ubuntu and Alpine Linux distributions 
 
 ## Setup
 
-The scripts in this folder consist of two pieces: utility scripts (in the `scripts` folder) and all components for a Docker image bringing all components together in one coherent setup:
+The scripts in this folder consist of two pieces: utility scripts (in the `scripts` folder) and all components for Docker images bringing all components together in one coherent setup:
 
 ### Components
 
-The resultant Docker image (built when executing `scripts/dockerbuild.sh`) comprises the following QSC-enabled components (all installed in `/opt/oqssa`):
+The resultant master Docker image (built when executing `scripts/dockerbuild.sh`) comprises the following QSC-enabled components (all installed in `/opt/oqssa`):
 
 - liboqs: All NIST-round 2 competition algorithms
 - openssl: QSC-enabled OpenSSL 1.1.1 library and utility applications
@@ -108,7 +108,7 @@ Setting this variable (e.g., by `export OQSWARNINGDISABLE=1`) causes the system 
 
 ## HAproxy Appliance
 
-The build script `scripts/dockerbuild.sh` also creates an appliance-style, OQS-enabled HAproxy in reverse proxy configuration as another docker image. This docker image only contains the basics required to run HAproxy in a QSC configuration. It does not contain curl as a frontend nor lighttpd as backend. It can be started with all the same parameters introduced above via the script `scripts/appliance-run.sh`. This script takes as optional parameter the address of the backend this HAproxy shall connect to. Default backend is at `127.0.0.1:82`.
+The build script `scripts/dockerbuild.sh` also creates an appliance-style, OQS-enabled HAproxy in reverse proxy configuration as another docker image. This docker image only contains the basics required to run HAproxy in a QSC configuration. It does not contain `curl` as a frontend nor `lighttpd` as backend. It can be started with all the same parameters introduced above via the script `scripts/appliance-run.sh`. This script takes as optional parameter the address of the backend this HAproxy shall connect to. Default backend is at `127.0.0.1:82`.
 
 **Note**: This appliance has a plain HTTP *backend* and an OQS-enabled *frontend*. By properly changing the configuration of `haproxy.cfg` the backend configuration can be changed to a TLS-protected one as well, of course.
 
@@ -164,4 +164,4 @@ Yes, set the environment variable `OQSWARNINGDISABLE` to a non-empty value.
 
 ###### Footnote
 
-For comparison, the folder `non-oqs` contains all prerequisites to set up an equivalent, non-OQS-enabled HAproxy --- also in a Docker image, also using Ubuntu 19 as the base OS, also using OpenSSL 1.1.1 and TLS 1.3 as the communications parameters, also featuring lighttpd as a backend with the same basic testing targets (`/` for GET and `/cgi-bin/upload.cgi` for POST). This way, one can run and exercize HAproxy images that are QSC-enabled and containing only classic cryptography side-by-side on the same infrastructure for comparative measurements.
+For comparison, the folder `non-oqs` contains all prerequisites to set up an equivalent, non-OQS-enabled HAproxy --- also in a Docker image, also using Ubuntu 19 as the base OS, also using OpenSSL 1.1.1 and TLS 1.3 as the communications parameters, also featuring lighttpd as a backend with the same basic testing targets (`/` for GET and `/cgi-bin/upload.cgi` for POST). This way, one can run and exercize HAproxy images that are QSC-enabled and containing only classic cryptography side-by-side on the same infrastructure for comparative measurements between QSC-enabled HAproxy and HAproxy only running classic cryptography.

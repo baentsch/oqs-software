@@ -14,6 +14,10 @@ if [ $# -eq 1 ]; then
    sed -i "s/my.ha.proxy:4443/$1/g" /opt/haproxy/haproxy.cfg 
 fi
 
+if [ "x$DISABLE_CERT_CHECK" != "x" ]; then
+   sed -i "s/required/none/g" /opt/haproxy/haproxy.cfg 
+fi
+
 # Start HAProxy:
 /opt/oqssa/sbin/haproxy -f /opt/haproxy/haproxy.cfg
 
