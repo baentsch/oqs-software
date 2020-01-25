@@ -8,7 +8,7 @@ In order to demonstrate the utility of QSC algorithms the [Open Quantum Safe (OQ
 
 The integration in this folder extends this work with a QSC-enabled [HAproxy](https://github.com/haproxy/haproxy) such as to permit further application-level experimentation utilizing real-world load-balancing HTTP(s) servers.
 
-To further ease deployment in non-QSC-enabled settings, this project also contains an Alpine-based appliance meant to operate as an application-level, QSC-enabled TLS VPN (virtual private network) with haproxy operating on both ends of the VPN tunnel.
+To further ease deployment in non-QSC-enabled settings, this project also contains an Alpine-based appliance ("client-side proxy") meant to operate as an application-level, QSC-enabled TLS VPN (virtual private network) with haproxy operating on both ends of the VPN tunnel.
 
 ## Platform
 
@@ -106,13 +106,13 @@ Setting this variable (e.g., by `export OQSINTERNALS=1`) causes the system to di
 
 Setting this variable (e.g., by `export OQSWARNINGDISABLE=1`) causes the system to no longer display the non-productiveness warning.
 
-## HAproxy Appliance
+## HAproxy Appliance ("server-side proxy")
 
 The build script `scripts/dockerbuild.sh` also creates an appliance-style, OQS-enabled HAproxy in reverse proxy configuration as another docker image. This docker image only contains the basics required to run HAproxy in a QSC configuration. It does not contain `curl` as a frontend nor `lighttpd` as backend. It can be started with all the same parameters introduced above via the script `scripts/appliance-run.sh`. This script takes as optional parameter the address of the backend this HAproxy shall connect to. Default backend is at `127.0.0.1:82`.
 
 **Note**: This appliance has a plain HTTP *backend* and an OQS-enabled *frontend*. By properly changing the configuration of `haproxy.cfg` the backend configuration can be changed to a TLS-protected one as well, of course.
 
-## Local Appliance
+## Local Appliance ("client-side proxy")
 
 The folder `alpine` contains Dockerfiles and related scripts to create a small, OQS-enabled (forward) HAproxy appliance. The purpose of this local appliance is to shield client software from (having to use) QSC-enabled software via a simple HTTP interface. As such, it has an OQS-**backend** and a plain HTTP frontend. By properly changing the configuration of `haproxy-appliance.cfg` (e.g., providing suitable certificates) the frontend may also be TLS-protected.
 
@@ -136,7 +136,7 @@ Creating the appliance is a two-step process executed by the script `dockerbuild
 
 By default, the appliance connects to an OQS-enabled TLS server running at the DNS name `my.ha.proxy`. This name can be changed to a server address of choice by passing a parameter to the startup script `scripts/localapp-run.sh`.
 
-By default, the appliance is accessible at the localhost port 8082. This port can be changed by adapting the relevant number in the script itself.
+By default, the appliance is accessible at the localhost port 8082. This port can be changed by adapting the relevant port number in the script itself.
 
 ## Putting it all together in a single-host demo environment
 
@@ -161,6 +161,14 @@ Solution: Either follow the steps [above to establish a real mini CA and certifi
 ### I'm annoyed by the constant 'non-productiveness' warnings. Can they be switched off?
 
 Yes, set the environment variable `OQSWARNINGDISABLE` to a non-empty value.
+
+### Which ports do the appliances run at and expose?
+
+By default, the client-side proxy operates ports 8080 and 4443 for plain HTTP and encrypted HTTPS traffic, respectively.
+
+By default, the server-side proxy operates ports 80 and 443 for plain HTTP and encrypted HTTPS traffic, respectively.
+
+For each proxy docker image, the actual ports exposed to the outside world can be set as usual with the `-p` option when executing `docker run`.
 
 ###### Footnote
 
