@@ -12,7 +12,7 @@ ADD startup-appliance.sh /opt/haproxy/startup.sh
 ADD CA.crt /opt/haproxy/CA.crt
 
 WORKDIR /opt/haproxy
-ENV OQSINTERNALS 1
-ENV OQSWARNINGDISABLE 1
+#ENV OQSINTERNALS 1
+#ENV OQSWARNINGDISABLE 1
 
 ENTRYPOINT ["/opt/haproxy/startup.sh"]

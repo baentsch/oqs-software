@@ -16,3 +16,6 @@
 # archived stuff
 *-archived
 *.tgz
+
+# local convenience scripts
+/haproxy/localscripts
