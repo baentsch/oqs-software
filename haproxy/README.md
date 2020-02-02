@@ -110,7 +110,7 @@ Setting this variable (e.g., by `export OQSWARNINGDISABLE=1`) causes the system 
 
 The build script `scripts/dockerbuild.sh` also creates an appliance-style, OQS-enabled HAproxy in reverse proxy configuration as another docker image. This docker image only contains the basics required to run HAproxy in a QSC configuration. It does not contain `curl` as a frontend nor `lighttpd` as backend. It can be started with all the same parameters introduced above via the script `scripts/appliance-run.sh`. This script takes as optional parameter the address of the backend this HAproxy shall connect to. Default backend is at `127.0.0.1:82`.
 
-**Note**: This appliance has a plain HTTP *backend* and an OQS-enabled *frontend*. By properly changing the configuration of `haproxy.cfg` the backend configuration can be changed to a TLS-protected one as well, of course.
+**Note**: This appliance has a plain HTTP *backend* and an OQS-enabled *frontend*. By properly changing the configuration of `haproxy.cfg` the backend configuration can be changed to a TLS-protected one as well, of course. In the docker image, setting the environment variable 'BACKEND' (see [quick start example](#short-form)) facilitates this without the need to change the docker image.
 
 ## Local Appliance ("client-side proxy")
 
