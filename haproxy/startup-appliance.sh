@@ -36,9 +36,13 @@ cat conf/server.crt conf/server.key > certkey.pem
 sed -i "s/kyber512/$KEM_ALG/g" /opt/haproxy/haproxy.cfg
 
 if [ "x$BACKEND" != "x" ]; then
-   sed -i "s/127.0.0.1:82/$BACKEND/g" /opt/haproxy/haproxy.cfg
+   sed -i "s/127.0.0.1:8282/$BACKEND/g" /opt/haproxy/haproxy.cfg
 fi
 
+# Start backend:
+lighttpd -D -f /etc/lighttpd/lighttpd.conf &
+
+sleep 3
 
 # Start HAProxy:
 /opt/oqssa/sbin/haproxy -f /opt/haproxy/haproxy.cfg

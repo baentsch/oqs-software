@@ -7,6 +7,7 @@ if [ $# -ne 1 ]; then
    exit -1
 fi
 
+mkdir -p oqs-haproxy
 # Mount local folder oqs-haproxy to store generated server key and CSR:
 docker run -v `pwd`/oqs-haproxy:/opt/haproxy -it haproxy-ubuntu bash -c "/opt/oqssa/bin/openssl req -new -newkey $SIG_ALG -keyout /opt/haproxy/server.key -out /opt/haproxy/server.csr -nodes -subj "/CN=$1" -config /opt/oqssa/ssl/openssl.cnf"
 

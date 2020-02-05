@@ -26,7 +26,7 @@ while (( "$#" )); do
       docker stop my.ha.proxy localproxy
       docker rm my.ha.proxy localproxy
       docker network rm haproxy-net   
-      sudo rm -rf ../oqs-*
+      rm -rf ../oqs-root ../oqs-haproxy
       shift 1 
       ;;
     --) 
@@ -68,16 +68,15 @@ fi
 
 # Start backend comprising of load-balancing haproxy fronting lighttpd
 # Without external port-forwarding, haproxy serves off port 443
-docker run --network haproxy-net --name my.ha.proxy -v `pwd`/oqs-haproxy:/opt/haproxy/conf -e SIG_ALG=$SIG_ALG -e KEM_ALG=$KEM_ALG -t haproxy-ubuntu &
+docker run --network haproxy-net --name my.ha.proxy -v `pwd`/oqs-haproxy:/opt/haproxy/conf -e SIG_ALG=$SIG_ALG -e KEM_ALG=$KEM_ALG -t haproxy-alpine &
 
 # Build appliance with newly created CA cert baked in
 cp oqs-root/CA.crt alpine
 cd alpine
 
-BASENAME=haproxy-alpine
-docker build -t $BASENAME-appliance -f Dockerfile-appliance .
+docker build -t haproxy-alpine-setca -f Dockerfile-setca .
 
 # Start frontend haproxy appliance; switch port to network-internally accessible 443
-docker run -p $LOCALPORT:8080 --name localproxy --network haproxy-net --rm -e SIG_ALG=$SIG_ALG -e KEM_ALG=$KEM_ALG -t haproxy-alpine-appliance my.ha.proxy:443 &
+docker run -p $LOCALPORT:8080 --name localproxy --network haproxy-net --rm -e SIG_ALG=$SIG_ALG -e KEM_ALG=$KEM_ALG -t haproxy-alpine-setca &
 
 echo "Now go to http://localhost:$LOCALPORT to access lighttpd via 2 tunneling haproxies..."

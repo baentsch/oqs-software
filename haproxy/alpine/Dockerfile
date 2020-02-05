@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine as intermediate
 
 RUN apk update && apk upgrade 
 
@@ -6,5 +6,36 @@ RUN apk update && apk upgrade
 RUN apk add openssl make build-base linux-headers openssl-dev autoconf automake git libtool unzip wget 
 
 ADD build-liboqs-openssl-curl-haproxy.sh /root/build-liboqs-openssl-curl-haproxy.sh
+RUN /root/build-liboqs-openssl-curl-haproxy.sh
 
 CMD ["/bin/sh"]
+
+FROM alpine
+
+MAINTAINER MIB (mib@zurich.ibm.com)
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apk update && apk upgrade && apk add lighttpd busybox-extras && rm -rf /var/cache/apk/*
+
+# Change backend port to 8282 and change default web page:
+ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
+RUN echo "Hello World from lighthttpd backend. If you see this, all is fine: lighttpd data served via haproxy protected by OQSSL..." > /var/www/localhost/htdocs/index.html
+
+RUN addgroup -g 1000 -S oqs && adduser -u 1000 -S oqs -G oqs 
+
+COPY --from=intermediate /opt /opt
+ADD haproxy-server.cfg /opt/haproxy/server/haproxy.cfg
+ADD haproxy-client.cfg /opt/haproxy/client/haproxy.cfg
+ADD startup-client.sh /opt/haproxy/client/startup.sh
+ADD startup-server.sh /opt/haproxy/server/startup.sh
+ADD CA.crt /opt/haproxy/CA.crt
+
+RUN chown -R oqs.oqs /opt/haproxy
+USER oqs
+
+WORKDIR /opt/haproxy
+#ENV OQSINTERNALS 1
+#ENV OQSWARNINGDISABLE 1
+
+ENTRYPOINT ["/opt/haproxy/server/startup.sh"]
