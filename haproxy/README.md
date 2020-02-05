@@ -42,13 +42,13 @@ In words: The HAproxy is configured on the frontend to provide a QSC-enabled TLS
 
 ### Short form
 
-`docker run -p 4443:4443 -e BACKEND=<backend-address:port> -t openqsafe/haproxy-appliance` starts a QSC-enabled HAproxy on port 4443 of the local machine acting as reverse proxy towards the (plain http) backend.
+`docker run -p 4443:4443 -e BACKEND=<backend-address:port> -t openqsafe/haproxy-ubuntu` starts a QSC-enabled HAproxy on port 4443 of the local machine acting as reverse proxy towards the (plain http) backend.
 
 If you have an OQS-enabled SDK or applications, you can connect to this as usual, e.g., via `curl https://HAPROXY-ADDRESS:4443`.
 
 If you do not have that, you can start a forward proxy with this command 
 
-`docker run -p 8080:8080 -e DISABLE_CERT_CHECK=1 -t openqsafe/haproxy-local-appliance HAPROXY-ADDRESS:4443` provides a plain interface to the above at `http://localhost:8080'.
+`docker run -p 8080:8080 -e DISABLE_CERT_CHECK=1 -t openqsafe/haproxy-alpine HAPROXY-ADDRESS:4443` provides a plain interface to the above at `http://localhost:8080'.
 
 This sets up a transparent, application level QSC-protected tunnel between the two HAproxy instances that can be accessed with any plain HTTP tooling or browser. For more secure and realistic setups, read on.
 
