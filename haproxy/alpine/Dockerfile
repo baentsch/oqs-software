@@ -33,7 +33,7 @@ ADD CA.crt /opt/haproxy/CA.crt
 
 RUN chown -R oqs.oqs /opt/haproxy
 USER oqs
-
+ENV PATH=/opt/oqssa/bin:/opt/oqssa/sbin:${PATH}
 WORKDIR /opt/haproxy
 #ENV OQSINTERNALS 1
 #ENV OQSWARNINGDISABLE 1

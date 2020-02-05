@@ -24,5 +24,6 @@ COPY haproxy-appliance.cfg /opt/haproxy/haproxy.cfg
 RUN useradd -ms /bin/bash oqs && chown -R oqs.oqs /opt/haproxy && lighttpd-enable-mod cgi 
 USER oqs
 WORKDIR /opt/haproxy
+ENV PATH=/opt/oqssa/bin:${PATH}
 
 CMD ["/opt/haproxy/startup.sh"]

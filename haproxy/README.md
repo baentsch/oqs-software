@@ -42,13 +42,13 @@ In words: The HAproxy is configured on the frontend to provide a QSC-enabled TLS
 
 ### Short form
 
-`docker run -p 4443:443 -e BACKEND=<backend-address:port> -t openqsafe/haproxy-appliance` starts a QSC-enabled HAproxy on port 4443 of the local machine acting as reverse proxy towards the (plain http) backend.
+`docker run -p 4443:4443 -e BACKEND=<backend-address:port> -t openqsafe/haproxy-ubuntu` starts a QSC-enabled HAproxy on port 4443 of the local machine acting as reverse proxy towards the (plain http) backend.
 
 If you have an OQS-enabled SDK or applications, you can connect to this as usual, e.g., via `curl https://HAPROXY-ADDRESS:4443`.
 
 If you do not have that, you can start a forward proxy with this command 
 
-`docker run -p 8080:8080 -e DISABLE_CERT_CHECK=1 -t openqsafe/haproxy-local-appliance HAPROXY-ADDRESS:4443` provides a plain interface to the above at `http://localhost:8080'.
+`docker run -p 8080:8080 -e DISABLE_CERT_CHECK=1 -t openqsafe/haproxy-alpine HAPROXY-ADDRESS:4443` provides a plain interface to the above at `http://localhost:8080'.
 
 This sets up a transparent, application level QSC-protected tunnel between the two HAproxy instances that can be accessed with any plain HTTP tooling or browser. For more secure and realistic setups, read on.
 
@@ -114,19 +114,19 @@ The build script `scripts/dockerbuild.sh` also creates an appliance-style, OQS-e
 
 ## Local Appliance ("client-side proxy")
 
-The folder `alpine` contains Dockerfiles and related scripts to create a small, OQS-enabled (forward) HAproxy appliance. The purpose of this local appliance is to shield client software from (having to use) QSC-enabled software via a simple HTTP interface. As such, it has an OQS-**backend** and a plain HTTP frontend. By properly changing the configuration of `haproxy-appliance.cfg` (e.g., providing suitable certificates) the frontend may also be TLS-protected.
+The folder `alpine` contains Dockerfiles and related scripts to create a small, OQS-enabled (forward) HAproxy appliance. The purpose of this local appliance is to shield client software from (having to use) QSC-enabled software via a simple HTTP interface. As such, it has an OQS-**backend** and a plain HTTP frontend. By switching between the two startup scripts provided, this HAproxy alpine appliance can be configured to run in either server-side or client-side proxy mode. 
 
 ### Architecture
 
 This new component permits the following setup:
 
-Application (curl, web browser, etc) ->(plain HTTP)-> local haproxy ->(QSC-SSL)-> haproxy ->(plain HTTP)-> lighttpd
+Application (curl, web browser, etc) ->(plain HTTP)-> client-side haproxy ->(QSC-SSL)-> (server-side) haproxy ->(plain HTTP)-> lighttpd
 
 In words: A second HAproxy is configured as a local, application-level VPN tunnel endpoint that any HTTP client application can connect to. It connects in turn to the first HAproxy that is configured on the frontend to provide a QSC-enabled TLS entry port and performs plain HTTP load balancing towards lighttpd as backend.
 
 ### Building
 
-Creating the appliance is a two-step process executed by the script `dockerbuild.sh` in the `alpine` folder:
+Creating the appliance is a two-step process (Docker "multistage build") executed by the script `dockerbuild.sh` in the `alpine` folder:
 
 - Compile-Install: All components introduced above are build and installed to a local folder (`opt`)
 - Build: Only the resultant libraries and executables are loaded into a minimal Alpine image
@@ -147,7 +147,7 @@ Pulling all the steps above together, the script `alpine/network-run.sh` configu
 - QSC-enabled HAproxy acting as a QSC-TLS enabled load balancer to a lighttpd instance running in the same image
 - QSC-enabled minimal HAproxy appliance acting as a local plain HTTP communications endpoint and communicating via QSC-secured TLS with the above HAproxy instance 
 
-**Hint**: The `alpine/network-run.sh` script can be called with a parameter to cause a cleanup of a previous run (`alpine/network-run.sh --clean`). All other parameters introduced above and controlling the actual OQS algorithms can also be used. Also, the local port can be set (`--port`) at which the appliance is listening for HTTP traffic to be forwarded.
+**Hint**: The `alpine/network-run.sh` script can be called with a parameter to cause a cleanup of a previous run (`alpine/network-run.sh --clean`). All other parameters introduced above and controlling the actual OQS algorithms can also be used. Also, the local port can be set (`--port`) at which the appliance is listening for HTTP traffic to be forwarded. **The port cannot be in the privileged port range <1024 as the image does not run with superuser/root privileges**
 
 
 ## FAQ
@@ -166,7 +166,7 @@ Yes, set the environment variable `OQSWARNINGDISABLE` to a non-empty value.
 
 By default, the client-side proxy operates ports 8080 and 4443 for plain HTTP and encrypted HTTPS traffic, respectively.
 
-By default, the server-side proxy operates ports 80 and 443 for plain HTTP and encrypted HTTPS traffic, respectively.
+By default, the server-side proxy operates ports 8087 and 4443 for plain HTTP and encrypted HTTPS traffic, respectively.
 
 For each proxy docker image, the actual ports exposed to the outside world can be set as usual with the `-p` option when executing `docker run`.
 
