@@ -67,7 +67,7 @@ fi
 ./scripts/sign-server-csr.sh
 
 # Ensure image exists:
-docker run -t haproxy-alpine /bin/echo
+docker run --entrypoint /bin/echo -t haproxy-alpine 
 
 if [ $? -ne 0 ]; then
    cd alpine && ./dockerbuild.sh && cd ..
