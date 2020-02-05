@@ -54,7 +54,7 @@ docker network create haproxy-net
 
 cd ..
 
-# Ensure images exist:
+# Ensure image exists:
 docker run -t haproxy-ubuntu /bin/echo
 
 if [ $? -ne 0 ]; then
@@ -65,6 +65,13 @@ fi
 ./scripts/create-oqsca.sh -s $SIG_ALG -k $KEM_ALG
 ./scripts/gen-server-csr.sh -s $SIG_ALG -k $KEM_ALG my.ha.proxy
 ./scripts/sign-server-csr.sh
+
+# Ensure image exists:
+docker run -t haproxy-alpine /bin/echo
+
+if [ $? -ne 0 ]; then
+   cd alpine && ./dockerbuild.sh && cd ..
+fi
 
 # Start backend comprising of load-balancing haproxy fronting lighttpd
 # Without external port-forwarding, haproxy serves off port 443
