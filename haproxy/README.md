@@ -159,11 +159,16 @@ Pulling all the steps above together, the script `alpine/network-run.sh` configu
 
 Most likely you have not configured the correct (QSC-)root CA to validate the (QSC-protected) authenticity (signature) of the HAproxy you want to connect to.
 
-Solution: Either follow the steps [above to establish a real mini CA and certificates](#more-realistic-setup-separating-ca-and-haproxy) or disable checking the server certificate by the haproxy config option `verify none`, exposed to the docker image by the environment variable `DISABLE_CERT_CHECK`.
+Solution: Either follow the steps [above to establish a real mini CA and certificates](#more-realistic-setup-separating-ca-and-haproxy) or disable checking the server certificate by the haproxy config option `verify none`, exposed to the docker image by the environment variable `DISABLE_CERT_CHECK`. For further possible errors read below.
 
 ### I'm annoyed by the constant 'non-productiveness' warnings. Can they be switched off?
 
-Yes, set the environment variable `OQSWARNINGDISABLE` to a non-empty value.
+Yes, set the environment variable `OQSWARNINGDISABLE` to a non-empty value. This can be facilitated in the docker invocations by passing `-e OQSWARNINGDISABLE=1` as an additional parameter.
+
+
+### Can I see which QSC cryptography is actually being used (and when)?
+
+Yes, set the environment variable `OQSINTERNALS` to a non-empty value. This can be facilitated in the docker invocations by passing `-e OQSINTERNALS=1` as an additional parameter.
 
 ### Which ports do the appliances run at and expose?
 
@@ -183,7 +188,7 @@ This means you have not established trust between the curl client and the CA tha
 
 ### My QSO-enabled HAproxy runs fine, but when I connect to it with curl, I get the error message "certificate subject name 'my.ha.proxy' does not match target host name". Why?
 
-This basically means that the DNS server name embedded into the QSC certificate has not been changed from the demo name 'my.ha.proxy'. Follow the instructions [shown above](#) and/or the script [alpine/network-run.sh](alpine/network-run.sh) for how to do that (in a localhost-based docker network).
+This basically means that the DNS server name embedded into the QSC certificate has not been changed from the demo name 'my.ha.proxy'. Follow the instructions [step 2 as shown above](#more-realistic-setup-separating-ca-and-haproxy) and/or the script [alpine/network-run.sh](alpine/network-run.sh) for how to do that (in a localhost-based docker network).
 
 
 ###### Footnote
