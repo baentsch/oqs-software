@@ -42,16 +42,19 @@ In words: The HAproxy is configured on the frontend to provide a QSC-enabled TLS
 
 ### Short form
 
-`docker run -p 4443:4443 -e BACKEND=<backend-address:port> -t openqsafe/haproxy-ubuntu` starts a QSC-enabled HAproxy on port 4443 of the local machine acting as reverse proxy towards the (plain http) backend.
+`docker run -p 4443:4443 -e BACKEND='backend-address:port' -t openqsafe/haproxy-ubuntu` starts a QSC-enabled HAproxy on port 4443 of the local machine acting as reverse proxy towards the (plain http) backend (at 'backend-address:port'). 
 
 If you have an OQS-enabled SDK or applications, you can connect to this as usual, e.g., via `curl https://HAPROXY-ADDRESS:4443`.
 
 If you do not have that, you can start a forward proxy with this command 
 
-`docker run -p 8080:8080 -e DISABLE_CERT_CHECK=1 -t openqsafe/haproxy-alpine HAPROXY-ADDRESS:4443` provides a plain interface to the above at `http://localhost:8080'.
+`docker run -p 8080:8080 -e DISABLE_CERT_CHECK=1 -t openqsafe/haproxy-alpine-client HAPROXY-ADDRESS:4443` provides a plain interface to the above at `http://localhost:8080'.
 
 This sets up a transparent, application level QSC-protected tunnel between the two HAproxy instances that can be accessed with any plain HTTP tooling or browser. For more secure and realistic setups, read on.
 
+*Note 1:* In case you don't have a plain HTTP server to OQS-enable, you can start one easily (on port 8000) for test purposes with `python3 -m http.server`. Be aware that such simple http server then serves the contents of the folder where it have been started...
+
+*Note 2:* The server-side proxy output the QSC-certificate it generated on the fly. You should pass this to a curl invocation with the option `--ca-cert` to eliminate the otherwise occuring warning about an untrusted server certificate.
 ### Some more details
 
 If provided no arguments, the main docker image configures all components and creates all required persistent HAproxy frontend PKI artifacts in an ephemeral manner: CA (key and certificate), server (key and certificate). The utility script for this is `scripts/run.sh`. The resultant HAproxy is accessible at the exposed port 4443.
@@ -169,6 +172,19 @@ By default, the client-side proxy operates ports 8080 and 4443 for plain HTTP an
 By default, the server-side proxy operates ports 8087 and 4443 for plain HTTP and encrypted HTTPS traffic, respectively.
 
 For each proxy docker image, the actual ports exposed to the outside world can be set as usual with the `-p` option when executing `docker run`.
+
+### My QSC-enabled HAproxy runs fine, but when I connect to it with curl, I get the error message "sslv3 alert handshake failure". Why?
+
+This is an indication that your curl client is not QSC-enabled. Be sure to run one readily build, e.g., from "openqsafe/curl", or build one for yourself, e.g., from [openquantumsafe/oqs-software](https://github.com/open-quantum-safe/oqs-software/tree/master/curl).
+
+### My QSC-enabled HAproxy runs fine, but when I connect to it with curl, I get the error message "curl failed to verify the legitimacy of the server". Why?
+
+This means you have not established trust between the curl client and the CA that issued the server certificate. The simple workaround is to pass the option `-k` (insecure) to curl which then disables the server certificate validation. This is of course not sensible in a real-world setting. To resolve this 'correctly' you have to pass the CA certificate to curl for validation with the option `--cacert 'certificate-file'`. The contents required, i.e., the CA root certificate is output when starting the server-side HAproxy ('haproxy-ubuntu'): Save these contents (everything from the line containing 'BEGIN CERTIFICATE' to the line 'END CERTIFICATE' -- including those lines) in a file called e.g. 'test.crt' and then call curl like this `curl --cacert test.crt https://HAPROXY-ADDRESS:4443' 
+
+### My QSO-enabled HAproxy runs fine, but when I connect to it with curl, I get the error message "certificate subject name 'my.ha.proxy' does not match target host name". Why?
+
+This basically means that the DNS server name embedded into the QSC certificate has not been changed from the demo name 'my.ha.proxy'. Follow the instructions [shown above](#) and/or the script [alpine/network-run.sh](alpine/network-run.sh) for how to do that (in a localhost-based docker network).
+
 
 ###### Footnote
 
