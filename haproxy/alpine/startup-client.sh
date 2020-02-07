@@ -15,7 +15,7 @@ if [ $# -eq 1 ]; then
 fi
 
 if [ "x$DISABLE_CERT_CHECK" != "x" ]; then
-   sed -i "s/required/none/g" /opt/haproxy/client/haproxy.cfg 
+   sed -i "s/ca-file CA.crt verify required/verify none/g" /opt/haproxy/client/haproxy.cfg 
 fi
 
 # Start HAProxy:

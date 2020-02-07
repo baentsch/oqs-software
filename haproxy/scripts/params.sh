@@ -21,7 +21,7 @@ while (( "$#" )); do
       break
       ;;
     -*|--*=) 
-      echo "Usage: $0 [-sig <OQS signature algorithm name>] [-kem <OQS KEM algorithm name>]. Exiting."
+      echo "Usage: $0 [--sig <OQS signature algorithm name>] [--kem <OQS KEM algorithm name>]. Exiting."
       exit 1
       ;;
     *) 

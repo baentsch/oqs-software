@@ -34,10 +34,10 @@ while (( "$#" )); do
       break
       ;;
     -*|--*=) 
-      echo "Usage: $0 [-sig <OQS signature algorithm name>] "
-      echo "          [-kem <OQS KEM algorithm name>]"
-      echo "          [-port <localhost port number where to make appliance accessible>]"
-      echo "          [-clean]"
+      echo "Usage: $0 [--sig <OQS signature algorithm name>] "
+      echo "          [--kem <OQS KEM algorithm name>]"
+      echo "          [--port <localhost port number where to make appliance accessible>]"
+      echo "          [--clean]"
       echo "Exiting."
       exit 1
       ;;

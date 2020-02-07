@@ -35,7 +35,11 @@ RUN chown -R oqs.oqs /opt/haproxy
 USER oqs
 ENV PATH=/opt/oqssa/bin:/opt/oqssa/sbin:${PATH}
 WORKDIR /opt/haproxy
-#ENV OQSINTERNALS 1
+
+# set to show algorithms actually used
+ENV OQSINTERNALS 1
+
+# set to disable usage warning
 #ENV OQSWARNINGDISABLE 1
 
 ENTRYPOINT ["/opt/haproxy/server/startup.sh"]
