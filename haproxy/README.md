@@ -116,6 +116,18 @@ Setting this variable (e.g., by `export OQSINTERNALS=1`) causes the system to di
 
 Setting this variable (e.g., by `export OQSWARNINGDISABLE=1`) causes the system to no longer display the non-productiveness warning.
 
+### Test endpoints
+
+The demo backend servers by default have two backends. 
+
+#### GET: Document root '/'
+
+Document root (URI `/`) delivers a short text and can be queried with HTTP method "GET".
+
+#### POST: CGI script '/cgi-bin/upload.cgi'
+
+One can POST some data to the URI `/cgi-bin/upload.cgi' to verify correct POST operation through the OQS-tunnel. A sample command for testing is `curl -i -X POST http://localhost:8082/cgi-bin/upload.cgi   -H "Content-Type: text/xml"   --data-binary "@sampledoc.pdf"`.
+
 ## HAproxy Appliance 
 
 The build script `scripts/alpine-dockerbuild.sh` creates a smaller, appliance-style, OQS-enabled HAproxy as another docker image. It also contains default client- and server-side startup configurations that can be virtualmount-adapted to local needs. The default image created is a server-side HAproxy load-balancing a plain HTTP server at localhost port 8282. By passing a parameter to the docker run invocation, the backend address can be modified, e.g. `docker run -p 4443:4443 -it haproxy-alpine some.server.com` would start up an HAproxy performing QSC-protected TLS load-balancing towards the backend running at 'http://some.server.com'.

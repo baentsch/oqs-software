@@ -30,7 +30,7 @@ ADD haproxy-client.cfg /opt/haproxy/client/haproxy.cfg
 ADD startup-client.sh /opt/haproxy/client/startup.sh
 ADD startup-server.sh /opt/haproxy/server/startup.sh
 ADD sh.sh /opt/haproxy/sh.sh
-ADD CA.crt /opt/haproxy/CA.crt
+#ADD CA.crt /opt/haproxy/CA.crt
 
 COPY upload.cgi /var/www/localhost/cgi-bin/upload.cgi
 COPY mod_cgi.conf /etc/lighttpd/mod_cgi.conf

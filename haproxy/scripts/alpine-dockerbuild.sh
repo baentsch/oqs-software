@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd alpine 
+cd ../alpine 
 
 docker build -t haproxy-alpine .
 
