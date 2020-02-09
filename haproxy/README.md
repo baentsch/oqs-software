@@ -126,7 +126,7 @@ Document root (URI `/`) delivers a short text and can be queried with HTTP metho
 
 #### POST: CGI script '/cgi-bin/upload.cgi'
 
-One can POST some data to the URI `/cgi-bin/upload.cgi' to verify correct POST operation through the OQS-tunnel. A sample command for testing is `curl -i -X POST http://localhost:8082/cgi-bin/upload.cgi   -H "Content-Type: text/xml"   --data-binary "@sampledoc.pdf"`.
+One can POST some data to the URI `/cgi-bin/upload.cgi` to verify correct POST operation through the OQS-tunnel. A sample command for testing is `curl -i -X POST http://localhost:8082/cgi-bin/upload.cgi   -H "Content-Type: text/xml"   --data-binary "@sampledoc.pdf"`.
 
 ## HAproxy Appliance 
 
