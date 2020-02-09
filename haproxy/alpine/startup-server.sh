@@ -9,13 +9,9 @@ fi
 cd /opt/haproxy
 
 if [ $# -eq 1 ]; then
-   # server address as sole optional parameter
-   echo "Setting target HAproxy $1"
-   sed -i "s/my.ha.proxy:4443/$1/g" /opt/haproxy/server/haproxy.cfg 
-fi
-
-if [ "x$DISABLE_CERT_CHECK" != "x" ]; then
-   sed -i "s/required/none/g" /opt/haproxy/server/haproxy.cfg 
+   # backend address as sole optional parameter
+   echo "Setting target backend $1"
+   sed -i "s/127.0.0.1:8282/$1/g" /opt/haproxy/server/haproxy.cfg 
 fi
 
 # Start backend:

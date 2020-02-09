@@ -29,9 +29,12 @@ ADD haproxy-server.cfg /opt/haproxy/server/haproxy.cfg
 ADD haproxy-client.cfg /opt/haproxy/client/haproxy.cfg
 ADD startup-client.sh /opt/haproxy/client/startup.sh
 ADD startup-server.sh /opt/haproxy/server/startup.sh
+ADD sh.sh /opt/haproxy/sh.sh
 ADD CA.crt /opt/haproxy/CA.crt
 
-RUN chown -R oqs.oqs /opt/haproxy
+COPY upload.cgi /var/www/localhost/cgi-bin/upload.cgi
+COPY mod_cgi.conf /etc/lighttpd/mod_cgi.conf
+RUN chown -R oqs.oqs /opt/haproxy 
 USER oqs
 ENV PATH=/opt/oqssa/bin:/opt/oqssa/sbin:${PATH}
 WORKDIR /opt/haproxy

@@ -23,10 +23,10 @@ while (( "$#" )); do
       shift 2
       ;;
     -c|--clean)
-      docker stop my.ha.proxy localproxy
-      docker rm my.ha.proxy localproxy
-      docker network rm haproxy-net   
-      rm -rf ../oqs-root ../oqs-haproxy
+      docker stop my.ha.proxy localproxy> /dev/null 2>&1
+      docker rm my.ha.proxy localproxy> /dev/null 2>&1
+      docker network rm haproxy-net   > /dev/null 2>&1
+      rm -rf ../oqs-root ../oqs-haproxy> /dev/null 2>&1
       shift 1 
       ;;
     --) 
@@ -52,34 +52,33 @@ eval set -- "$PARAMS"
 # Establish network in which to run
 docker network create haproxy-net
 
-cd ..
-
 # Ensure image exists:
-docker run -t haproxy-ubuntu /bin/echo
+docker run --entrypoint /bin/echo -t haproxy-alpine 
 
 if [ $? -ne 0 ]; then
-   ./scripts/dockerbuild.sh
+   cd scripts && ./alpine-dockerbuild.sh && cd ..
 fi
+
+echo "Password requested is protecting the root CA key."
+echo "Choose one in line with openssl minimum requirements."
+
+
 
 # Create CA & server certs:
 ./scripts/create-oqsca.sh -s $SIG_ALG -k $KEM_ALG
 ./scripts/gen-server-csr.sh -s $SIG_ALG -k $KEM_ALG my.ha.proxy
 ./scripts/sign-server-csr.sh
 
-# Ensure image exists:
-docker run --entrypoint /bin/echo -t haproxy-alpine 
-
-if [ $? -ne 0 ]; then
-   cd alpine && ./dockerbuild.sh && cd ..
-fi
 
 # Start backend comprising of load-balancing haproxy fronting lighttpd
 # Without external port-forwarding, haproxy serves off port 443
 docker run --network haproxy-net --name my.ha.proxy -v `pwd`/oqs-haproxy:/opt/haproxy/conf -e SIG_ALG=$SIG_ALG -e KEM_ALG=$KEM_ALG -t haproxy-alpine &
 
 # Build appliance with newly created CA cert baked in
-cp oqs-root/CA.crt alpine
-cd alpine
+cd oqs-root
+echo "FROM haproxy-alpine" > Dockerfile-setca
+echo "ADD CA.crt /opt/haproxy/CA.crt" >> Dockerfile-setca
+echo "ENTRYPOINT [\"/opt/haproxy/client/startup.sh\"] " >> Dockerfile-setca
 
 docker build -t haproxy-alpine-setca -f Dockerfile-setca .
 

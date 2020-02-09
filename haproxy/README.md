@@ -8,7 +8,7 @@ In order to demonstrate the utility of QSC algorithms the [Open Quantum Safe (OQ
 
 The integration in this folder extends this work with a QSC-enabled [HAproxy](https://github.com/haproxy/haproxy) such as to permit "hands-on" application-level experimentation utilizing real-world load-balancing HTTP(s) servers.
 
-To further ease deployment in non-QSC-enabled settings, this project also contains an Alpine-based, size-optimized appliance meant to ease deployment in Kubernetes-style execution environments. The configurations pre-defined for this appliance permit its use as either end of an application-level, QSC-enabled TLS VPN (virtual private network). The benefit of this setup is that non-QSC aware clients can connect to a local HAproxy enpoint which then tunnels with QSC protection to a server-side HAproxy which in turn load-balances requests to other, non-QSC aware infrastructure.
+To further ease deployment in non-QSC-enabled settings, this project also contains an Alpine-based, size-optimized appliance meant to ease deployment in Kubernetes-style execution environments. The configurations pre-defined for this appliance permit its use as either end of an application-level, QSC-enabled TLS virtual private network (VPN). The benefit of this setup is that non-QSC aware clients can connect to a local HAproxy endpoint which then tunnels with QSC protection to a server-side HAproxy which in turn load-balances requests to other, non-QSC aware infrastructure.
 
 ## Platform
 
@@ -21,7 +21,7 @@ The scripts in this folder consist of two pieces: utility scripts (in the `scrip
 
 ### Components
 
-The resultant master Docker image (built when executing `scripts/dockerbuild.sh`) comprises the following QSC-enabled components (all installed in `/opt/oqssa`):
+The required ubuntu master Docker image (built when executing `scripts/ubuntu-dockerbuild.sh`) comprises the following QSC-enabled components (all installed in `/opt/oqssa`):
 
 - liboqs: All NIST-round 2 competition algorithms
 - openssl: QSC-enabled OpenSSL 1.1.1 library and utility applications
@@ -42,7 +42,11 @@ In words: The HAproxy is configured on the frontend to provide a QSC-enabled TLS
 
 ## Quick start
 
-### Short form (based on pre-compiled docker images)
+### Short form: based on pre-compiled docker images
+
+Just run `scripts/network-demo.sh`: This sets up a local docker network, instantiates a plain HTTP backend, establishes an OQS-enabled TLS HAproxy in front of that, starts a second HAproxy operating as a client-side proxy connecting to the former, server-side HAproxy and exposing again, a plain HTTP frontend (default port 8082).
+
+### More configurable version: based on docker images and requiring one's own backend
 
 `docker run -p 4443:4443 -e BACKEND='backend-address:port' -t openqsafe/haproxy-ubuntu` starts a QSC-enabled HAproxy on port 4443 of the local machine acting as reverse proxy towards the (plain http) backend (at 'backend-address:port'). 
 
@@ -54,7 +58,7 @@ If you do not have that, you can start a QSC-enabled forward proxy with a plain 
 
 This sets up a transparent, application level QSC-protected tunnel between the two HAproxy instances that can be accessed with any plain HTTP tooling or browser. For more secure and realistic setups, read on.
 
-*Note 1:* In case you don't have a plain HTTP server to OQS-enable, you can start one easily (on port 8000) for test purposes with `python3 -m http.server`. Be aware that such simple http server then serves the contents of the folder where it have been started...
+*Note 1:* In case you don't have a plain HTTP server to OQS-enable, you can start one easily (on port 8000) for test purposes with `python3 -m http.server`. Be aware that such simple http server then serves the contents of the folder where it has been started...
 
 *Note 2:* The server-side proxy outputs the QSC-certificate it generated on the fly. You should pass this to a curl invocation with the option `--cacert` to eliminate the otherwise occuring warning about an untrusted server certificate.
 
@@ -70,11 +74,11 @@ All default settings for running the haproxy are encoded in the `haproxy.cfg` co
 
 ### Docker hub availability
 
-The docker image containing all components as described here is available at Dockerhub under the name `openqsafe/haproxy-ubuntu`.
+The docker images containing all components as described here is available at Dockerhub under the name `openqsafe/haproxy-ubuntu` and `openqsafe/haproxy-alpine` respectively.
 
 ### Building
 
-The docker image providing the core functionality described can be build by running the script `scripts/dockerbuild.sh`. The script has been validated to run OK under Linux and OSX with docker [installed](https://docs.docker.com/install/).
+The docker image providing the core functionality described can be build by running the script `scripts/ubuntu-dockerbuild.sh`. The script has been validated to run OK under Linux and OSX with docker [installed](https://docs.docker.com/install/).
 
 ## More realistic setup: Separating CA and HAproxy
 
@@ -114,7 +118,7 @@ Setting this variable (e.g., by `export OQSWARNINGDISABLE=1`) causes the system 
 
 ## HAproxy Appliance 
 
-The build script `alpine/dockerbuild.sh` creates a smaller, appliance-style, OQS-enabled HAproxy as another docker image. It also contains default client- and server-side startup configurations that can be virtualmount-adapted to local needs. The default image created is a server-side HAproxy load-balancing a plain HTTP server at localhost port 8282. By passing a parameter to the docker run invocation, the backend address can be modified, e.g. `docker run -p 4443:4443 -it haproxy-alpine some.server.com` would start up an HAproxy performing QSC-protected TLS load-balancing towards the backend running at 'http://some.server.com'.
+The build script `scripts/alpine-dockerbuild.sh` creates a smaller, appliance-style, OQS-enabled HAproxy as another docker image. It also contains default client- and server-side startup configurations that can be virtualmount-adapted to local needs. The default image created is a server-side HAproxy load-balancing a plain HTTP server at localhost port 8282. By passing a parameter to the docker run invocation, the backend address can be modified, e.g. `docker run -p 4443:4443 -it haproxy-alpine some.server.com` would start up an HAproxy performing QSC-protected TLS load-balancing towards the backend running at 'http://some.server.com'.
 
 **Note**: This appliance has a plain HTTP *backend* and an OQS-enabled *frontend*. By properly changing the configuration of `haproxy-server.cfg` the backend configuration can be changed to a TLS-protected one as well, of course. 
 
@@ -132,7 +136,7 @@ In words: A second HAproxy is configured as a local, application-level VPN tunne
 
 ### Building
 
-Creating the appliance is a two-step process (Docker "multistage build") executed by the script `dockerbuild.sh` in the `alpine` folder:
+Creating the appliance is a two-step process (Docker "multistage build") executed by the script `alpine-dockerbuild.sh` in the `scripts` folder:
 
 - Compile-Install: All components introduced above are build and installed to a local folder (`opt`) within an intermediate Docker image
 - Build: Only the resultant libraries and executables are loaded into a finally exported minimal Alpine image
@@ -146,7 +150,7 @@ By default, the appliance is accessible at the localhost port 8082. This port ca
 
 ## Putting it all together in a single-host demo environment
 
-Pulling all the steps above together, the script `alpine/network-run.sh` configures all components to establish and exercise all components in the architecture depicted above: 
+Pulling all the steps above together, the script `scripts/network-run.sh` configures all components to establish and exercise all components in the architecture depicted above: 
 
 - Dockerfiles are created if not locally existing
 - QSC-CA and -haproxy keys and certificates are generated
@@ -154,7 +158,7 @@ Pulling all the steps above together, the script `alpine/network-run.sh` configu
 - QSC-enabled HAproxy acting as a QSC-TLS enabled load balancer to a lighttpd instance running in the same image
 - QSC-enabled minimal HAproxy appliance acting as a local plain HTTP communications endpoint and communicating via QSC-secured TLS with the above HAproxy instance 
 
-**Hint**: The `alpine/network-run.sh` script can be called with a parameter to cause a cleanup of a previous run (`alpine/network-run.sh --clean`). All other parameters introduced above and controlling the actual OQS algorithms can also be used. Also, the local port can be set (`--port`) at which the appliance is listening for HTTP traffic to be forwarded. **The port cannot be in the privileged port range <1024 as the image does not run with superuser/root privileges**
+**Hint**: The `scripts/network-run.sh` script can be called with a parameter to cause a cleanup of a previous run (`scripts/network-run.sh --clean`). All other parameters introduced above and controlling the actual OQS algorithms can also be used. Also, the local port can be set (`--port`) at which the appliance is listening for HTTP traffic to be forwarded. **The port cannot be in the privileged port range <1024 as the image does not run with superuser/root privileges**
 
 
 ## FAQ
@@ -190,9 +194,9 @@ This is an indication that your curl client is not QSC-enabled. Be sure to run o
 
 This means you have not established trust between the curl client and the CA that issued the server certificate. The simple workaround is to pass the option `-k` (insecure) to curl which then disables the server certificate validation. This is of course not sensible in a real-world setting. To resolve this 'correctly' you have to pass the CA certificate to curl for validation with the option `--cacert 'certificate-file'`. The contents required, i.e., the CA root certificate is output when starting the server-side HAproxy ('haproxy-ubuntu'): Save these contents (everything from the line containing 'BEGIN CERTIFICATE' to the line 'END CERTIFICATE' -- including those lines) in a file called e.g. 'test.crt' and then call curl like this `curl --cacert test.crt https://HAPROXY-ADDRESS:4443' 
 
-### My QSO-enabled HAproxy runs fine, but when I connect to it with curl, I get the error message "certificate subject name 'my.ha.proxy' does not match target host name". Why?
+### My QSC-enabled HAproxy runs fine, but when I connect to it with curl, I get the error message "certificate subject name 'my.ha.proxy' does not match target host name". Why?
 
-This basically means that the DNS server name embedded into the QSC certificate has not been changed from the demo name 'my.ha.proxy'. Follow the instructions [step 2 as shown above](#more-realistic-setup-separating-ca-and-haproxy) and/or the script [alpine/network-run.sh](alpine/network-run.sh) for how to do that (in a localhost-based docker network).
+This basically means that the DNS server name embedded into the QSC certificate has not been changed from the demo name 'my.ha.proxy'. Follow the instructions [step 2 as shown above](#more-realistic-setup-separating-ca-and-haproxy) and/or the script [scripts/network-run.sh](scripts/network-run.sh) for how to do that (in a localhost-based docker network).
 
 
 ###### Footnote

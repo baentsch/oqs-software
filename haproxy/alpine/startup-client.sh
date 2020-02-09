@@ -9,8 +9,8 @@ fi
 cd /opt/haproxy
 
 if [ $# -eq 1 ]; then
-   # server address as sole optional parameter
-   echo "Setting target HAproxy $1"
+   # QSC server-side proxy address as sole optional parameter
+   echo "Setting target server side HAproxy $1"
    sed -i "s/my.ha.proxy:4443/$1/g" /opt/haproxy/client/haproxy.cfg 
 fi
 
