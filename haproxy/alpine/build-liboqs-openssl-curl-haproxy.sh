@@ -25,7 +25,7 @@ export GITREV=`git rev-parse --short HEAD`
 sed -i "s/static int stoperrset = 0;/static int stoperrset = 0; if (\!getenv(\"OQSWARNINGDISABLE\")) printf(\"OQS-enabled OpenSSL ($GITNAME, $GITREV) starting. Only for non-productive use. \\\nSee https:\/\/github.com\/open-quantum-safe\/openssl#limitations-and-security\\\n\");/g" ssl/ssl_init.c
 
 # Insert KEM information:
-sed -i "s/\/\* initialize the kex \*\//if (getenv(\"OQSINTERNALS\")) printf(\"KEM activating: \%s\\\n\", oqs_alg_name);/g" /root/openssl/ssl/statem/extensions_clnt.c
+sed -i "s/\/\* initialize the kex \*\//if (getenv(\"OQSINTERNALS\")) printf(\"KEM activating: \%s\\\n\", oqs_alg_name);/g" ssl/statem/extensions_clnt.c
 
 # Insert SigAlg information:
 sed -i "s/if (OQS_SIG_verify(/if (getenv(\"OQSINTERNALS\")) printf(\"QSC signature verifying: %s\\\n\", get_oqs_alg_name(oqs_key->nid));\n    if (OQS_SIG_verify(/g" crypto/ec/oqs_meth.c
