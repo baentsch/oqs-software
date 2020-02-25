@@ -82,7 +82,7 @@ echo "ENTRYPOINT [\"/opt/haproxy/client/startup.sh\"] " >> Dockerfile-setca
 
 docker build -t haproxy-alpine-setca -f Dockerfile-setca .
 
-# Start frontend haproxy appliance; switch port to network-internally accessible 443
+# Start frontend haproxy appliance; switch port to network-internally accessible 4443
 docker run -p $LOCALPORT:8080 --name ha-localproxy --network haproxy-demo-net --rm -e SIG_ALG=$SIG_ALG -e KEM_ALG=$KEM_ALG -t haproxy-alpine-setca &
 
 echo "Now go to http://localhost:$LOCALPORT to access lighttpd via 2 tunneling haproxies..."
