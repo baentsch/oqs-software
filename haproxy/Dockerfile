@@ -1,6 +1,6 @@
 FROM ubuntu:19.10 as intermediate
 
-RUN apt-get update -qq && apt-get upgrade -y && apt-get dist-upgrade -y && apt-get install -y gcc autoconf automake git libssl-dev libtool make unzip wget zlib1g-dev 
+RUN apt-get update -qq && apt-get upgrade -y && apt-get dist-upgrade -y && apt-get install -y gcc autoconf automake git libssl-dev libtool make unzip wget zlib1g-dev cmake
 
 COPY build-liboqs-openssl-curl-haproxy.sh /root/build-liboqs-openssl-curl-haproxy.sh
 
