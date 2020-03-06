@@ -16,6 +16,12 @@ localCheckout: &localCheckout
   steps:
     - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
     - setup_remote_docker
+    - run:
+        name: Test docker env vars
+        command: echo $DOCKER_USER
+    - run:
+        name: show env vars
+        command: env
 #    - run:
 #        name: Curl
 #        command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
@@ -32,7 +38,6 @@ localCheckout: &localCheckout
        xcode: "11.3.0"
     steps:
         - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
-        - setup_remote_docker
         - run:
             name: Install dependencies
             command: |
@@ -43,7 +48,7 @@ localCheckout: &localCheckout
               )
         - run:
             name: Look around
-            command: docker ; docker version
+            command: docker ; docker version; env
         - run:
             name: Curl
             command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
@@ -64,8 +69,10 @@ workflows:
   version: 2
   build:
     jobs:
-      - macOS    
-      - ubuntu-bionic-x86_64
+      - macOS:   
+          context: openqsafe
+      - ubuntu-bionic-x86_64:
+          context: openqsafe
   nightly:
     triggers:
       - schedule:
