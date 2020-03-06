@@ -16,15 +16,23 @@ localCheckout: &localCheckout
   steps:
     - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
     - setup_remote_docker
-    - run:
-        name: Curl
-        command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl .)
+#    - run:
+#        name: Curl
+#        command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
+    - run: 
+        name: Apache httpd
+        command: .circleci/git_no_checkin_in_last_day.sh || (cd httpd && docker build -t oqs-httpd-img . && docker run --detach --rm --name oqs-httpd oqs-httpd-img && sleep 2 && docker exec oqs-httpd bash -c 'echo  "GET /" | /opt/openssl/bin/openssl s_client -CAfile CA.crt -curves frodo640aes -crlf -connect localhost:4433')
+    - run: 
+        name: nginx
+        command: .circleci/git_no_checkin_in_last_day.sh || (cd nginx && docker build -t oqs-nginx-img . && docker run --detach --rm --name oqs-nginx oqs-nginx-img && sleep 2 && docker exec oqs-nginx /opt/openssl/apps/openssl s_client -CAfile CA.crt -curves kyber512 -connect localhost:4433')
+
 
 .mac_job: &macjob
     macos:
        xcode: "11.3.0"
     steps:
         - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
+        - setup_remote_docker
         - run:
             name: Install dependencies
             command: |
@@ -38,70 +46,26 @@ localCheckout: &localCheckout
             command: docker ; docker version
         - run:
             name: Curl
-            command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl .)
+            command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
 
 jobs:
   debian-buster-amd64:
     <<: *linuxjob
     environment:
       IMAGE: openquantumsafe/ci-debian-buster-amd64:latest
-      ARCH: x64
-      LIBOQS: master
-      OPENSSL: 111
   ubuntu-bionic-x86_64:
     <<: *linuxjob
     environment:
       IMAGE: openqsafe/ci-ubuntu-bionic-x86_64:latest
-      ARCH: x64
-      LIBOQS: master
-      OPENSSL: 111
-  ubuntu-bionic-x86_64-noconn:
-    <<: *linuxjob
-    environment:
-      IMAGE: openqsafe/ci-ubuntu-bionic-x86_64:latest
-      ARCH: x64
-      LIBOQS: master
-      OPENSSL: 111
-      SKIP_TESTS: connection
-  ubuntu-bionic-x86_64-shared:
-    <<: *linuxjob
-    environment:
-      IMAGE: openqsafe/ci-ubuntu-bionic-x86_64:latest
-      ARCH: x64
-      LIBOQS: master
-      OPENSSL: 111
-      LIBTYPE: shared
-  ubuntu-bionic-x86_64-shared-noconn:
-    <<: *linuxjob
-    environment:
-      IMAGE: openqsafe/ci-ubuntu-bionic-x86_64:latest
-      ARCH: x64
-      LIBOQS: master
-      OPENSSL: 111
-      LIBTYPE: shared
-      SKIP_TESTS: connection
-  macOS-shared-noconn:
+  macOS:
     <<: *macjob
-    environment:
-      LIBTYPE: shared
-      SKIP_TESTS: connection
-  macOS-shared:
-    <<: *macjob
-    environment:
-      LIBTYPE: shared
-  macOS-static:
-    <<: *macjob
-    environment:
-      LIBTYPE: no-shared
-      SKIP_TESTS: connection
 
 workflows:
   version: 2
   build:
     jobs:
-      - macOS-shared-noconn    
-      - ubuntu-bionic-x86_64-shared-noconn
-      - ubuntu-bionic-x86_64-noconn
+      - macOS    
+      - ubuntu-bionic-x86_64
   nightly:
     triggers:
       - schedule:
@@ -111,9 +75,5 @@ workflows:
               only:
                 - master
     jobs:
-      - macOS-shared    
       - debian-buster-amd64
-      - macOS-static    
-      - ubuntu-bionic-x86_64
-      - ubuntu-bionic-x86_64-shared
 
