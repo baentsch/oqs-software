@@ -17,12 +17,6 @@ localCheckout: &localCheckout
     - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
     - setup_remote_docker
     - run:
-        name: Test docker env vars
-        command: echo $DOCKER_LOGIN
-    - run:
-        name: show env vars
-        command: env
-    - run:
         name: docker login
         command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
 #    - run:
@@ -34,6 +28,9 @@ localCheckout: &localCheckout
     - run: 
         name: nginx
         command: .circleci/git_no_checkin_in_last_day.sh || (cd nginx && docker build -t oqs-nginx-img . && docker run --detach --rm --name oqs-nginx oqs-nginx-img && sleep 2 && docker exec oqs-nginx /opt/openssl/apps/openssl s_client -CAfile CA.crt -curves kyber512 -connect localhost:4433)
+    - run:
+        name: Push images
+        command: docker tag oqs-nginx openqsafe/nginx-generic && docker push openqsafe/nginx-generic
 
 
 .mac_job: &macjob
@@ -41,6 +38,12 @@ localCheckout: &localCheckout
        xcode: "11.3.0"
     steps:
         - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
+        - run:
+            name: Scan env
+            command: env
+        - run:
+            name: docker login
+            command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
         - run:
             name: Install dependencies
             command: |
@@ -51,7 +54,7 @@ localCheckout: &localCheckout
               )
         - run:
             name: Look around
-            command: docker ; echo $DOCKER_LOGIN; docker version
+            command: docker ; docker version
         - run:
             name: Curl
             command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
