@@ -39,15 +39,13 @@ localCheckout: &localCheckout
     steps:
         - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
         - run:
-            name: Scan env
-            command: env
-        - run:
             name: Install dependencies
             command: |
               .circleci/git_no_checkin_in_last_day.sh || (
               brew update &&
               brew unlink python@2 &&
               brew install docker docker-machine &&
+              docker-machine ls &&
               docker-machine start &&
               docker-machine env default &&
               eval "$(docker-machine env default)" &&
