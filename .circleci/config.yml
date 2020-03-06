@@ -18,10 +18,13 @@ localCheckout: &localCheckout
     - setup_remote_docker
     - run:
         name: Test docker env vars
-        command: echo $DOCKER_USER
+        command: echo $DOCKER_LOGIN
     - run:
         name: show env vars
         command: env
+    - run:
+        name: docker login
+        command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
 #    - run:
 #        name: Curl
 #        command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
@@ -48,7 +51,7 @@ localCheckout: &localCheckout
               )
         - run:
             name: Look around
-            command: docker ; docker version; env
+            command: docker ; echo $DOCKER_LOGIN; docker version
         - run:
             name: Curl
             command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
