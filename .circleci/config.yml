@@ -25,7 +25,6 @@ localCheckout: &localCheckout
        xcode: "11.3.0"
     steps:
         - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
-        - setup_remote_docker
         - run:
             name: Install dependencies
             command: |
@@ -34,6 +33,9 @@ localCheckout: &localCheckout
               brew unlink python@2 &&
               brew install docker
               )
+        - run:
+            name: Look around
+            command: docker ; docker version
         - run:
             name: Curl
             command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl .)
