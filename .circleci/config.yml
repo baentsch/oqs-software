@@ -21,7 +21,7 @@ localCheckout: &localCheckout
         command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
     - run:
         name: Curl
-        command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
+        command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh || echo "Test complete")
     - run: 
         name: Apache httpd
         command: .circleci/git_no_checkin_in_last_day.sh || (cd httpd && docker build -t oqs-httpd-img . && docker run --detach --rm --name oqs-httpd oqs-httpd-img && sleep 2 && docker exec oqs-httpd bash -c 'echo  "GET /" | /opt/openssl/bin/openssl s_client -CAfile CA.crt -curves frodo640aes -crlf -connect localhost:4433')
@@ -47,7 +47,11 @@ localCheckout: &localCheckout
               .circleci/git_no_checkin_in_last_day.sh || (
               brew update &&
               brew unlink python@2 &&
-              brew install docker
+              brew install docker docker-machine &&
+              docker-machine create --driver virtualbox default &&
+              docker-machine env default &&
+              eval "$(docker-machine env default)" &&
+              docker version
               )
         - run:
             name: docker login
