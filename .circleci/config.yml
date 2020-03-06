@@ -19,12 +19,12 @@ localCheckout: &localCheckout
 #    - run:
 #        name: Curl
 #        command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
-    - run: 
-        name: Apache httpd
-        command: .circleci/git_no_checkin_in_last_day.sh || (cd httpd && docker build -t oqs-httpd-img . && docker run --detach --rm --name oqs-httpd oqs-httpd-img && sleep 2 && docker exec oqs-httpd bash -c 'echo  "GET /" | /opt/openssl/bin/openssl s_client -CAfile CA.crt -curves frodo640aes -crlf -connect localhost:4433')
+#    - run: 
+#        name: Apache httpd
+#        command: .circleci/git_no_checkin_in_last_day.sh || (cd httpd && docker build -t oqs-httpd-img . && docker run --detach --rm --name oqs-httpd oqs-httpd-img && sleep 2 && docker exec oqs-httpd bash -c 'echo  "GET /" | /opt/openssl/bin/openssl s_client -CAfile CA.crt -curves frodo640aes -crlf -connect localhost:4433')
     - run: 
         name: nginx
-        command: .circleci/git_no_checkin_in_last_day.sh || (cd nginx && docker build -t oqs-nginx-img . && docker run --detach --rm --name oqs-nginx oqs-nginx-img && sleep 2 && docker exec oqs-nginx /opt/openssl/apps/openssl s_client -CAfile CA.crt -curves kyber512 -connect localhost:4433')
+        command: .circleci/git_no_checkin_in_last_day.sh || (cd nginx && docker build -t oqs-nginx-img . && docker run --detach --rm --name oqs-nginx oqs-nginx-img && sleep 2 && docker exec oqs-nginx /opt/openssl/apps/openssl s_client -CAfile CA.crt -curves kyber512 -connect localhost:4433)
 
 
 .mac_job: &macjob
