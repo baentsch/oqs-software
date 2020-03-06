@@ -15,6 +15,7 @@ localCheckout: &localCheckout
     - image: ${IMAGE}
   steps:
     - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
+    - setup_remote_docker
     - run:
         name: Curl
         command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl .)
@@ -24,6 +25,7 @@ localCheckout: &localCheckout
        xcode: "11.3.0"
     steps:
         - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
+        - setup_remote_docker
         - run:
             name: Install dependencies
             command: |
@@ -47,14 +49,14 @@ jobs:
   ubuntu-bionic-x86_64:
     <<: *linuxjob
     environment:
-      IMAGE: openquantumsafe/ci-ubuntu-bionic-x86_64:latest
+      IMAGE: openqsafe/ci-ubuntu-bionic-x86_64:latest
       ARCH: x64
       LIBOQS: master
       OPENSSL: 111
   ubuntu-bionic-x86_64-noconn:
     <<: *linuxjob
     environment:
-      IMAGE: openquantumsafe/ci-ubuntu-bionic-x86_64:latest
+      IMAGE: openqsafe/ci-ubuntu-bionic-x86_64:latest
       ARCH: x64
       LIBOQS: master
       OPENSSL: 111
@@ -62,7 +64,7 @@ jobs:
   ubuntu-bionic-x86_64-shared:
     <<: *linuxjob
     environment:
-      IMAGE: openquantumsafe/ci-ubuntu-bionic-x86_64:latest
+      IMAGE: openqsafe/ci-ubuntu-bionic-x86_64:latest
       ARCH: x64
       LIBOQS: master
       OPENSSL: 111
@@ -70,7 +72,7 @@ jobs:
   ubuntu-bionic-x86_64-shared-noconn:
     <<: *linuxjob
     environment:
-      IMAGE: openquantumsafe/ci-ubuntu-bionic-x86_64:latest
+      IMAGE: openqsafe/ci-ubuntu-bionic-x86_64:latest
       ARCH: x64
       LIBOQS: master
       OPENSSL: 111
