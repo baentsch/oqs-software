@@ -30,7 +30,7 @@ localCheckout: &localCheckout
         command: .circleci/git_no_checkin_in_last_day.sh || (cd nginx && docker build -t oqs-nginx-img . && docker run --detach --rm --name oqs-nginx oqs-nginx-img && sleep 2 && docker exec oqs-nginx /opt/openssl/apps/openssl s_client -CAfile CA.crt -curves kyber512 -connect localhost:4433)
     - run:
         name: Push images
-        command: docker tag oqs-curl openqsafe/oqs-curl-generic && docker push openqsafe/oqs-curl-generic && docker tag oqs-httpd-img openqsafe/httpd-generic && docker push openqsafe/httpd-generic && docker tag oqs-nginx-img openqsafe/nginx-generic && docker push openqsafe/nginx-generic
+        command: docker tag oqs-curl openqsafe/curl-generic && docker push openqsafe/curl-generic && docker tag oqs-httpd-img openqsafe/httpd-generic && docker push openqsafe/httpd-generic && docker tag oqs-nginx-img openqsafe/nginx-generic && docker push openqsafe/nginx-generic
 
 
 .mac_job: &macjob
@@ -48,7 +48,7 @@ localCheckout: &localCheckout
               brew update &&
               brew unlink python@2 &&
               brew install docker docker-machine &&
-              docker-machine create --driver virtualbox default &&
+              docker-machine start &&
               docker-machine env default &&
               eval "$(docker-machine env default)" &&
               docker version
@@ -78,8 +78,6 @@ workflows:
     jobs:
       - macOS:   
           context: openqsafe
-      - ubuntu-bionic-x86_64:
-          context: openqsafe
   nightly:
     triggers:
       - schedule:
@@ -89,5 +87,8 @@ workflows:
               only:
                 - master
     jobs:
-      - debian-buster-amd64
+      - debian-buster-amd64:
+          context: openqsafe
+      - ubuntu-bionic-x86_64:
+          context: openqsafe
 
