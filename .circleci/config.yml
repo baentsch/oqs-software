@@ -44,7 +44,8 @@ localCheckout: &localCheckout
               .circleci/git_no_checkin_in_last_day.sh || (
               brew update &&
               brew unlink python@2 &&
-              brew install docker docker-machine virtualbox &&
+              brew cask install virtualbox &&
+              brew install docker docker-machine &&
               docker-machine create default &&
               docker-machine ls &&
               docker-machine start &&
