@@ -44,7 +44,7 @@ localCheckout: &localCheckout
               .circleci/git_no_checkin_in_last_day.sh || (
               brew update &&
               brew unlink python@2 &&
-              brew install docker docker-machine &&
+              brew install docker docker-machine virtualbox &&
               docker-machine create default &&
               docker-machine ls &&
               docker-machine start &&
@@ -77,8 +77,8 @@ workflows:
     jobs:
       - macOS:   
           context: openqsafe
-      - ubuntu-bionic-x86_64:
-          context: openqsafe
+      #- ubuntu-bionic-x86_64:
+      #    context: openqsafe
   nightly:
     triggers:
       - schedule:
