@@ -51,7 +51,7 @@ localCheckout: &localCheckout
               docker-machine env default &&
               eval "$(docker-machine env default)" &&
               docker version &&
-              brew unlink python@2 &&
+              brew unlink python@2 
               )
         - run:
             name: docker login
