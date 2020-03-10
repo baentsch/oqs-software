@@ -43,7 +43,6 @@ localCheckout: &localCheckout
             command: |
               .circleci/git_no_checkin_in_last_day.sh || (
               brew update &&
-              brew unlink python@2 &&
               brew cask install virtualbox &&
               brew install docker docker-machine &&
               docker-machine create default &&
@@ -51,7 +50,8 @@ localCheckout: &localCheckout
               docker-machine start &&
               docker-machine env default &&
               eval "$(docker-machine env default)" &&
-              docker version
+              docker version &&
+              brew unlink python@2 &&
               )
         - run:
             name: docker login
