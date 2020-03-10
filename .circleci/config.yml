@@ -45,6 +45,7 @@ localCheckout: &localCheckout
               brew update &&
               brew unlink python@2 &&
               brew install docker docker-machine &&
+              docker-machine create default &&
               docker-machine ls &&
               docker-machine start &&
               docker-machine env default &&
@@ -75,6 +76,8 @@ workflows:
   build:
     jobs:
       - macOS:   
+          context: openqsafe
+      - ubuntu-bionic-x86_64:
           context: openqsafe
   nightly:
     triggers:
