@@ -33,32 +33,33 @@ localCheckout: &localCheckout
         command: docker tag oqs-curl openqsafe/curl-generic && docker push openqsafe/curl-generic && docker tag oqs-httpd-img openqsafe/httpd-generic && docker push openqsafe/httpd-generic && docker tag oqs-nginx-img openqsafe/nginx-generic && docker push openqsafe/nginx-generic
 
 
-.mac_job: &macjob
-    macos:
-       xcode: "11.3.0"
-    steps:
-        - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
-        - run:
-            name: Install dependencies
-            command: |
-              .circleci/git_no_checkin_in_last_day.sh || (
-              brew update &&
-              brew cask install virtualbox &&
-              brew install docker docker-machine &&
-              docker-machine create default &&
-              docker-machine ls &&
-              docker-machine start &&
-              docker-machine env default &&
-              eval "$(docker-machine env default)" &&
-              docker version &&
-              brew unlink python@2 
-              )
-        - run:
-            name: docker login
-            command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
-        - run:
-            name: Curl
-            command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
+# As of now (Mar 2020) CircleCI does not support building current OSX docker images... :-(
+#.mac_job: &macjob
+#    macos:
+#       xcode: "11.3.0"
+#    steps:
+#        - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
+#        - run:
+#            name: Install dependencies
+#            command: |
+#              .circleci/git_no_checkin_in_last_day.sh || (
+#              brew update &&
+#              brew cask install virtualbox &&
+#              brew install docker docker-machine &&
+#              docker-machine create default &&
+#              docker-machine ls &&
+#              docker-machine start &&
+#              docker-machine env default &&
+#              eval "$(docker-machine env default)" &&
+#              docker version &&
+#              brew unlink python@2 
+#              )
+#        - run:
+#            name: docker login
+#            command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
+#        - run:
+#            name: Curl
+#            command: .circleci/git_no_checkin_in_last_day.sh || (cd curl && docker build -t oqs-curl . && docker run -e TEST_TIME=5 -e KEM_ALG=sikep751 -e SIG_ALG=picnicl1fs -it oqs-curl perftest.sh)
 
 jobs:
   debian-buster-amd64:
@@ -68,7 +69,7 @@ jobs:
   ubuntu-bionic-x86_64:
     <<: *linuxjob
     environment:
-      IMAGE: openqsafe/ci-ubuntu-bionic-x86_64:latest
+      IMAGE: openquantumsafe/ci-ubuntu-bionic-x86_64:latest
   macOS:
     <<: *macjob
 
@@ -76,10 +77,8 @@ workflows:
   version: 2
   build:
     jobs:
-      - macOS:   
+      - ubuntu-bionic-x86_64:
           context: openqsafe
-      #- ubuntu-bionic-x86_64:
-      #    context: openqsafe
   nightly:
     triggers:
       - schedule:
@@ -90,6 +89,8 @@ workflows:
                 - master
     jobs:
       - debian-buster-amd64:
+          context: openqsafe
+      - macOS:   
           context: openqsafe
       - ubuntu-bionic-x86_64:
           context: openqsafe
