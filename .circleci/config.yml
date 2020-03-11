@@ -70,8 +70,8 @@ jobs:
     <<: *linuxjob
     environment:
       IMAGE: openquantumsafe/ci-ubuntu-bionic-x86_64:latest
-  macOS:
-    <<: *macjob
+#  macOS:
+#    <<: *macjob
 
 workflows:
   version: 2
@@ -90,8 +90,8 @@ workflows:
     jobs:
       - debian-buster-amd64:
           context: openqsafe
-      - macOS:   
-          context: openqsafe
+#      - macOS:   
+#          context: openqsafe
       - ubuntu-bionic-x86_64:
           context: openqsafe
 
