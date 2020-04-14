@@ -2,7 +2,7 @@
 
 if [ "x$KEM_ALG" == "x" ]; then
    # kem name not given
-   export KEM_ALG=kyber512
+   export KEM_ALG=kyber768
 fi
 
 if [ "x$SIG_ALG" == "x" ]; then
@@ -33,7 +33,7 @@ fi
 # The location for haproxy.cfg
 cat conf/server.crt conf/server.key > certkey.pem
 
-sed -i "s/kyber512/$KEM_ALG/g" /opt/haproxy/haproxy.cfg
+sed -i "s/kyber768/$KEM_ALG/g" /opt/haproxy/haproxy.cfg
 
 if [ "x$BACKEND" != "x" ]; then
    sed -i "s/127.0.0.1:8282/$BACKEND/g" /opt/haproxy/haproxy.cfg

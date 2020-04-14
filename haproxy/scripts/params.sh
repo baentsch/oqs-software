@@ -2,7 +2,7 @@
 
 # default values:
 export SIG_ALG=dilithium4
-export KEM_ALG=kyber512
+export KEM_ALG=kyber768
 
 PARAMS=""
 

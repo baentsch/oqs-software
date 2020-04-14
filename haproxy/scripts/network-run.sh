@@ -4,7 +4,7 @@
 # default values:
 LOCALPORT=8082
 SIG_ALG=dilithium4
-KEM_ALG=kyber512
+KEM_ALG=kyber768
 
 PARAMS=""
 

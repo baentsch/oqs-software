@@ -36,9 +36,9 @@ ln -s $INSTALLDIR/lib/liboqs.so.0.0.0 $INSTALLDIR/lib/liboqs.so.0
 
 # build haproxy
 cd $BUILDDIR
-wget https://github.com/haproxy/haproxy/archive/master.zip && unzip master.zip 
+wget http://www.haproxy.org/download/2.1/src/haproxy-2.1.4.tar.gz  && tar xzvf haproxy-2.1.4.tar.gz
 
-cd haproxy-master && make LDFLAGS="-Wl,-rpath,$INSTALLDIR/lib" SSL_INC=$INSTALLDIR/include SSL_LIB=$INSTALLDIR/lib TARGET=linux-glibc USE_OPENSSL=1 && make PREFIX=$INSTALLDIR install
+cd haproxy-2.1.4 && make LDFLAGS="-Wl,-rpath,$INSTALLDIR/lib" SSL_INC=$INSTALLDIR/include SSL_LIB=$INSTALLDIR/lib TARGET=linux-glibc USE_OPENSSL=1 && make PREFIX=$INSTALLDIR install
 
 # build curl
 cd $BUILDDIR
@@ -51,7 +51,6 @@ CPPFLAGS="-I$INSTALLDIR" \
 LDFLAGS=-Wl,-R$INSTALLDIR/lib ./configure --prefix=$INSTALLDIR \
                     --enable-debug \
                     --with-ssl=$INSTALLDIR && \
-    sed -i 's/EVP_MD_CTX_create/EVP_MD_CTX_new/g; s/EVP_MD_CTX_destroy/EVP_MD_CTX_free/g' lib/vtls/openssl.c && \
     make && make install;
 
 # Static build:
@@ -59,7 +58,6 @@ LDFLAGS=-Wl,-R$INSTALLDIR/lib ./configure --prefix=$INSTALLDIR \
 #        ./configure --disable-shared --enable-static --prefix=$INSTALLDIR \
 #                    --enable-debug \
 #                    --with-ssl=$INSTALLDIR && \
-#    sed -i 's/EVP_MD_CTX_create/EVP_MD_CTX_new/g; s/EVP_MD_CTX_destroy/EVP_MD_CTX_free/g' lib/vtls/openssl.c && sed -i 's/LIBS = -lssl -lcrypto -lz/LIBS = -lssl -lcrypto -lz -loqs -ldl/g' Makefile
 #    make V=1 curl_LDFLAGS=-all-static && make install;
 
 echo "export PATH=/opt/oqssa/bin:$PATH" >> /root/.bashrc

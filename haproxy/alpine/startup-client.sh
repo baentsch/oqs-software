@@ -3,7 +3,7 @@
 if [ "x$KEM_ALG" != "x" ]; then
    # kem name given, set it
    echo "Setting KEM alg $KEM_ALG"
-   sed -i "s/kyber512/$KEM_ALG/g" /opt/haproxy/client/haproxy.cfg
+   sed -i "s/kyber768/$KEM_ALG/g" /opt/haproxy/client/haproxy.cfg
 fi
 
 cd /opt/haproxy
@@ -15,7 +15,7 @@ if [ $# -eq 1 ]; then
 fi
 
 if [ "x$DISABLE_CERT_CHECK" != "x" ]; then
-   sed -i "s/ca-file CA.crt verify required/verify none/g" /opt/haproxy/client/haproxy.cfg 
+   sed -i "s/ca-file \/opt\/haproxy\/conf\/CA.crt verify required/verify none/g" /opt/haproxy/client/haproxy.cfg 
 fi
 
 # Start HAProxy:

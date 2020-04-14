@@ -68,7 +68,7 @@ If provided no arguments, the main docker image configures all components and cr
 
 If one wants to interact with all components on a command line within the running image, the utility script `scripts/run-bash.sh` should be run: All components are started by executing `startup.sh &`, may be checked to be running (`ps -ags`) and can be exercized with the command `curl --cacert root/CA.crt https://my.ha.proxy:4443`.
 
-**Hint**: The startup scripts can take the names of the OQS KEM and OQS signature algorithm as parameters. The former defines the cryptographic cipher used, the latter the signature type of the certificates. By default these values are `kyber512` and `dilithium4`, respectively.
+**Hint**: The startup scripts can take the names of the OQS KEM and OQS signature algorithm as parameters. The former defines the cryptographic cipher used, the latter the signature type of the certificates. By default these values are `kyber768` and `dilithium4`, respectively.
 
 All default settings for running the haproxy are encoded in the `haproxy.cfg` configuration file (in `/opt/haproxy`).
 
@@ -96,13 +96,13 @@ For anyone interested in running an HAproxy for a longer period and utilizing a 
 All shell scripts have the same optional two parameters:
 
 - `--sig` (or `-s`): Signature algorithm: Choose any listed [here](https://github.com/open-quantum-safe/openssl#authentication). Default is `dilithium4`.
-- `--kem` (or `-k`): KEM algorithm: Choose any listed [here](https://github.com/open-quantum-safe/openssl#key-exchange). Default is `kyber512`.
+- `--kem` (or `-k`): KEM algorithm: Choose any listed [here](https://github.com/open-quantum-safe/openssl#key-exchange). Default is `kyber768`.
 
-By way of example, the command `./scripts/run-bash.sh -s qteslapi ` will create a docker instance running a QSC haproxy environment using QTeslaI signatures with a Kyber512 KEM.
+By way of example, the command `./scripts/run-bash.sh -s qteslapi ` will create a docker instance running a QSC haproxy environment using QTeslaI signatures with a Kyber768 KEM.
 
 ### HAproxy
 
-The most relevant of the many [HAproxy configuration options](https://cbonte.github.io/haproxy-dconv/2.0/configuration.html) for the purpose of this setup is the **frontend** *bind* option: Here, the `curves` parameter defines the QSC key encapsulation mechanism (KEM) actually operated by the haproxy instance. By default, this is set to `kyber512` but can be changed to any of the presently supported KEMs listed [here](https://github.com/open-quantum-safe/openssl#key-exchange).
+The most relevant of the many [HAproxy configuration options](https://cbonte.github.io/haproxy-dconv/2.0/configuration.html) for the purpose of this setup is the **frontend** *bind* option: Here, the `curves` parameter defines the QSC key encapsulation mechanism (KEM) actually operated by the haproxy instance. By default, this is set to `kyber768` but can be changed to any of the presently supported KEMs listed [here](https://github.com/open-quantum-safe/openssl#key-exchange).
 
 ### Demonstration environment variables
 
@@ -152,6 +152,8 @@ Creating the appliance is a two-step process (Docker "multistage build") execute
 
 - Compile-Install: All components introduced above are build and installed to a local folder (`opt`) within an intermediate Docker image
 - Build: Only the resultant libraries and executables are loaded into a finally exported minimal Alpine image
+
+**Note**: The Alpine appliance deploys the stable HAProxy v2.1.4. The Ubuntu dev image always deploys the most recent HAProxy code, thus may be more unstable.
 
 
 ### Parameters

@@ -3,7 +3,7 @@
 if [ "x$KEM_ALG" != "x" ]; then
    # kem name given, set it
    echo "Setting KEM alg $KEM_ALG"
-   sed -i "s/kyber512/$KEM_ALG/g" /opt/haproxy/server/haproxy.cfg
+   sed -i "s/kyber768/$KEM_ALG/g" /opt/haproxy/server/haproxy.cfg
 fi
 
 cd /opt/haproxy
