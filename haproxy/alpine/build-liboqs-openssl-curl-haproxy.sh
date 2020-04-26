@@ -26,7 +26,7 @@ export GITREV=`git rev-parse --short HEAD`
 sed -i "s/static int stoperrset = 0;/static int stoperrset = 0; if (\!getenv(\"OQSWARNINGDISABLE\")) printf(\"OQS-enabled OpenSSL ($GITNAME, $GITREV) starting. Only for non-productive use. \\\nSee https:\/\/github.com\/open-quantum-safe\/openssl#limitations-and-security\\\n\");/g" ssl/ssl_init.c
 
 # Insert KEM information:
-sed -i "s/\/\* initialize the kex \*\//if (getenv(\"OQSINTERNALS\")) printf(\"KEM activating: \%s\\\n\", oqs_alg_name);/g" ssl/statem/extensions_clnt.c
+sed -i "s/\/\* initialize the kex \*\//if (getenv(\"OQSINTERNALS\")) printf(\"KEM activating: \%s \%s\\\n\", oqs_alg_name, do_hybrid?\"(hybrid)\":\"(plain)\");/g" ssl/statem/extensions_clnt.c
 
 # Insert SigAlg information:
 sed -i "s/if (OQS_SIG_verify(/if (getenv(\"OQSINTERNALS\")) printf(\"QSC signature verifying: %s\\\n\", get_oqs_alg_name(oqs_key->nid));\n    if (OQS_SIG_verify(/g" crypto/ec/oqs_meth.c
@@ -42,10 +42,11 @@ cd haproxy-2.1.4 && make LDFLAGS="-Wl,-rpath,$INSTALLDIR/lib" SSL_INC=$INSTALLDI
 
 # build curl
 cd $BUILDDIR
-CURL_VERSION=7.66.0
+CURL_VERSION=7.69.1
 wget https://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz && tar -zxvf curl-$CURL_VERSION.tar.gz
 
 cd $BUILDDIR/curl-${CURL_VERSION}
+patch -p1 < /root/patch-7.69.1.oqs.txt
 # Dynamic build:
 CPPFLAGS="-I$INSTALLDIR" \
 LDFLAGS=-Wl,-R$INSTALLDIR/lib ./configure --prefix=$INSTALLDIR \
