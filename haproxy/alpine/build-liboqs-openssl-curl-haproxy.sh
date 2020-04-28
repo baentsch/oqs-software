@@ -31,7 +31,7 @@ sed -i "s/\/\* initialize the kex \*\//if (getenv(\"OQSINTERNALS\")) printf(\"KE
 # Insert SigAlg information:
 sed -i "s/if (OQS_SIG_verify(/if (getenv(\"OQSINTERNALS\")) printf(\"QSC signature verifying: %s\\\n\", get_oqs_alg_name(oqs_key->nid));\n    if (OQS_SIG_verify(/g" crypto/ec/oqs_meth.c
 
-LDFLAGS="-Wl,-rpath -Wl,$INSTALLDIR/lib" ./Configure linux-x86_64 -DOQS_DEFAULT_GROUPS=\"p256_kyber768:kyber768\" -lm --prefix=$INSTALLDIR && make && make install
+LDFLAGS="-Wl,-rpath -Wl,$INSTALLDIR/lib" ./Configure linux-x86_64 -DOQS_DEFAULT_GROUPS=\"prime256v1:secp384r1:secp521r1:X25519:X448:kyber512:kyber768:kyber1024:p256_kyber512:p256_kyber768:p256_kyber1024\" -lm --prefix=$INSTALLDIR && make && make install
 ln -s $INSTALLDIR/lib/liboqs.so.0.0.0 $INSTALLDIR/lib/liboqs.so.0
 
 # build haproxy
