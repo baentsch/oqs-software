@@ -17,6 +17,9 @@ localCheckout: &localCheckout
     - checkout # change this from "checkout" to "*localCheckout" when running CircleCI locally
     - setup_remote_docker
     - run:
+        name: env test
+        command: echo "Targetname: " && env && echo $TARGETNAME
+    - run:
         name: docker login
         command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin && echo "Targetname: $TARGETNAME" && env
     - run:
