@@ -18,7 +18,7 @@ localCheckout: &localCheckout
     - setup_remote_docker
     - run:
         name: docker login
-        command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
+        command: echo $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin && echo "Targetname: $TARGETNAME" && env
     - run:
         name: checkout dependencies
         command: git clone --single-branch https://github.com/open-quantum-safe/liboqs.git tmp/liboqs && git clone --branch OQS-OpenSSL_1_1_1-stable --single-branch https://github.com/open-quantum-safe/openssl.git tmp/openssl
