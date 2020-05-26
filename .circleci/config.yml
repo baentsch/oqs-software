@@ -86,14 +86,14 @@ workflows:
       - ubuntu-bionic-x86_64:
           context: openquantumsafe
 # TBD: Review for better secret protection when https://ideas.circleci.com/ideas/CCI-I-981 is resolved.
-  nightly:
-    triggers:
-      - schedule:
-          cron: "0 4 * * *"
-          filters:
-            branches:
-              only:
-                - master
+#  nightly:
+#    triggers:
+#      - schedule:
+#          cron: "0 4 * * *"
+#          filters:
+#            branches:
+#              only:
+#                - master
     jobs:
       - debian-buster-amd64:
           context: openquantumsafe
