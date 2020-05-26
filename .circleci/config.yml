@@ -94,6 +94,6 @@ workflows:
 #            branches:
 #              only:
 #                - master
-    jobs:
-      - debian-buster-amd64:
-          context: openquantumsafe
+#    jobs:
+#      - debian-buster-amd64:
+#          context: openquantumsafe
