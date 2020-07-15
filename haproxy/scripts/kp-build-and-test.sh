@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-#./scripts/alpine-dockerbuild.sh
+./scripts/alpine-dockerbuild.sh
 cd alpine && docker run --rm --env KEM_ALG=p384_kyber768 -p 4443:4443 -v `pwd`/oqs-haproxy:/opt/haproxy/conf -t haproxy-alpine  &
 echo "Sleeping 10 seconds to allow docker image to start"
 sleep 10
