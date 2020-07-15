@@ -6,8 +6,7 @@ RUN apk update && apk upgrade
 RUN apk add openssl make build-base linux-headers openssl-dev autoconf automake git libtool unzip wget cmake 
 
 ADD patch-7.69.1.oqs.txt /root/patch-7.69.1.oqs.txt
-#ADD build-liboqs-openssl-curl-haproxy.sh /root/build-liboqs-openssl-curl-haproxy.sh
-ADD build-liboqs-openssl-curl-haproxy-kp-prereleaseopenssl.sh /root/build-liboqs-openssl-curl-haproxy.sh
+ADD build-liboqs-openssl-curl-haproxy.sh /root/build-liboqs-openssl-curl-haproxy.sh
 RUN /root/build-liboqs-openssl-curl-haproxy.sh
 
 CMD ["/bin/sh"]
