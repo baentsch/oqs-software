@@ -14,8 +14,8 @@ git clone --single-branch --branch OQS-OpenSSL_1_1_1-stable https://github.com/o
 
 # Build & install liboqs
 cd $BUILDDIR/liboqs
-mkdir build && cd build && cmake ..  -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$BUILDDIR/openssl/oqs && make -j && make install
-mkdir build-static && cd build-static && cmake ..  -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$BUILDDIR/openssl/oqs && make -j && make install
+mkdir build && cd build && cmake -GNinja ..  -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$BUILDDIR/openssl/oqs && ninja && ninja install
+mkdir build-static && cd build-static && cmake -GNinja ..  -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$BUILDDIR/openssl/oqs && ninja && ninja install
 
 # Build and install openssl-oqs
 cd $BUILDDIR/openssl
